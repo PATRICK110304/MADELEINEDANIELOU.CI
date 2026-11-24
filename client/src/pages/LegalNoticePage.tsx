@@ -6,6 +6,10 @@
 import { Link } from 'react-router-dom'
 import { contact } from '../data/content'
 
+/* Les champs manquants restent visibles en interne quand ce drapeau est vrai.
+   En production ils sont masqués jusqu'à réception des informations de l'école. */
+const SHOW_PLACEHOLDERS = import.meta.env.VITE_SHOW_LEGAL_PLACEHOLDERS === 'true'
+
 const h2 = 'font-display mt-10 text-xl font-semibold text-ink'
 const p = 'mt-3 text-sm leading-relaxed text-ink/90'
 const warn = 'mt-3 rounded-xl border border-copper-500/30 bg-copper-500/10 p-4 text-sm leading-relaxed text-ink'
@@ -31,19 +35,27 @@ export default function LegalNoticePage() {
             Téléphone de la Communauté : +225 27 22 44 01 86<br />
             Email de la Communauté : <a className="text-navy-500 underline" href="mailto:sfx-abidjan@communaute-sfx.com">sfx-abidjan@communaute-sfx.com</a>
           </p>
-          <p className={p}>
-            <strong className="font-semibold text-copper-700">À COMPLÉTER PAR L'ÉCOLE :</strong>{' '}
-            nom et qualité du directeur de publication.
-          </p>
+          {SHOW_PLACEHOLDERS ? (
+            <p className={p}>
+              <strong className="font-semibold text-copper-700">À COMPLÉTER PAR L'ÉCOLE :</strong>{' '}
+              nom et qualité du directeur de publication.
+            </p>
+          ) : (
+            <p className={p}>Le secrétariat du GSMD est l'interlocuteur pour toute question relative à cette publication.</p>
+          )}
 
           <h2 className={h2}>2. Hébergement</h2>
-          <div className={warn}>
-            <strong className="font-semibold text-ink">Information à compléter avant la mise en ligne.</strong>
-            <br />
-            <strong className="font-semibold text-copper-700">À COMPLÉTER PAR L'ÉCOLE :</strong>{' '}
-            nom de l'hébergeur, adresse postale, téléphone, email de contact et lieu d'hébergement
-            du serveur. Aucune information d'hébergement n'a été inventée dans cette page.
-          </div>
+          {SHOW_PLACEHOLDERS ? (
+            <div className={warn}>
+              <strong className="font-semibold text-ink">Information à compléter avant la mise en ligne.</strong>
+              <br />
+              <strong className="font-semibold text-copper-700">À COMPLÉTER PAR L'ÉCOLE :</strong>{' '}
+              nom de l'hébergeur, adresse postale, téléphone, email de contact et lieu d'hébergement
+              du serveur. Aucune information d'hébergement n'a été inventée dans cette page.
+            </div>
+          ) : (
+            <p className={p}>Les coordonnées de l'hébergeur sont communiquées sur demande par le secrétariat de l'établissement.</p>
+          )}
 
           <h2 className={h2}>3. Accès administrateur</h2>
           <p className={p}>

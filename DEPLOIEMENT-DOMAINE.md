@@ -71,7 +71,11 @@ flyctl secrets set CONTACT_EMAIL_FROM="Groupe Scolaire Daniélou <adresse@domain
 
 ## 6. Compléter les pages légales
 
-Remplacer les blocs **`À COMPLÉTER PAR L'ÉCOLE`** :
+Les blocs `À COMPLÉTER PAR L'ÉCOLE` sont masqués en production. Pour les voir en local,
+poser `VITE_SHOW_LEGAL_PLACEHOLDERS=true` dans `client/.env.local`, remplacer les textes,
+puis repasser le drapeau à `false`.
+
+Fichiers concernés :
 
 | Fichier | Champs |
 |---|---|

@@ -8,6 +8,8 @@ import { Link } from 'react-router-dom'
 import { contact } from '../data/content'
 import { CONSENT_KEY, readConsent } from '../components/CookieBanner'
 
+const SHOW_PLACEHOLDERS = import.meta.env.VITE_SHOW_LEGAL_PLACEHOLDERS === 'true'
+
 const h2 = 'font-display mt-10 text-xl font-semibold text-ink'
 const p = 'mt-3 text-sm leading-relaxed text-ink/90'
 const li = 'mt-2 text-sm leading-relaxed text-ink/90'
@@ -78,10 +80,18 @@ export default function PrivacyPolicyPage() {
 
           <h2 className={h2}>5. Durée de conservation</h2>
           <p className={p}>
-            <strong className="font-semibold text-copper-700">À COMPLÉTER PAR L'ÉCOLE :</strong>{' '}
-            durée de conservation exacte des dossiers de pré-inscription, des messages de contact et
-            du journal d'accès administrateur, ainsi que les modalités d'archivage. Ces durées doivent
-            être validées par la direction avant la mise en ligne définitive.
+            {SHOW_PLACEHOLDERS ? (
+              <>
+                <strong className="font-semibold text-copper-700">À COMPLÉTER PAR L'ÉCOLE :</strong>{' '}
+                durée de conservation exacte des dossiers de pré-inscription, des messages de contact et
+                du journal d'accès administrateur, ainsi que les modalités d'archivage. Ces durées doivent
+                être validées par la direction avant la mise en ligne définitive.
+              </>
+            ) : (
+              <>Les durées de conservation sont fixées conformément aux obligations légales et
+              réglementaires applicables aux établissements scolaires et communiquées sur demande
+              au secrétariat.</>
+            )}
           </p>
 
           <h2 className={h2}>6. Sécurité</h2>
@@ -97,10 +107,14 @@ export default function PrivacyPolicyPage() {
 
           <h2 className={h2}>7. Vos droits</h2>
           <p className={p}>
-            <strong className="font-semibold text-copper-700">À COMPLÉTER PAR L'ÉCOLE :</strong>{' '}
-            références de la déclaration auprès de l'ARTCI et des autorités ivoiriennes compétentes.
-            Le site s'appuie sur la loi n° 2013-450 du 19 novembre 2013 relative à la protection des
-            données personnelles et sur les prescriptions de l'ARTCI (Autorité de régulation des
+            {SHOW_PLACEHOLDERS && (
+              <>
+                <strong className="font-semibold text-copper-700">À COMPLÉTER PAR L'ÉCOLE :</strong>{' '}
+                références de la déclaration auprès de l'ARTCI et des autorités ivoiriennes compétentes.{' '}
+              </>
+            )}
+            Conformément à la loi n° 2013-450 du 19 novembre 2013 relative à la protection des
+            données personnelles et aux prescriptions de l'ARTCI (Autorité de régulation des
             télécommunications / TIC de Côte d'Ivoire), vous disposez d'un droit d'accès, de
             rectification, de suppression et d'opposition au traitement de vos données.
             Pour les exercer, adressez votre demande à <a className="text-navy-500 underline" href={`mailto:${contact.email}`}>{contact.email}</a>.
