@@ -26,6 +26,18 @@ export const supabase: SupabaseClient | null = supabaseAuthEnabled
 
 export const TOKEN_KEY = 'gsmd_admin_token'
 
+/** Alerte serveur : connexion admin (email / WhatsApp / appel / webhook).
+    Fire-and-forget : une panne de notification ne bloque jamais le login. */
+async function notifyLogin(token: string) {
+  try {
+    await fetch(`${API_BASE}/api/auth/notify-login`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ source: 'admin-login' }),
+    })
+  } catch { /* silencieux */ }
+}
+
 /** Connecte l'administrateur et retourne un access_token à jour. */
 export async function loginAdmin(email: string, password: string): Promise<string> {
   if (supabase) {
@@ -34,6 +46,7 @@ export async function loginAdmin(email: string, password: string): Promise<strin
     const token = data.session?.access_token
     if (!token) throw new Error('Session invalide')
     sessionStorage.setItem(TOKEN_KEY, token)
+    void notifyLogin(token)
     return token
   }
 
@@ -45,6 +58,7 @@ export async function loginAdmin(email: string, password: string): Promise<strin
   const data = await res.json().catch(() => ({}))
   if (!res.ok) throw new Error(data.message || 'Connexion refusée')
   sessionStorage.setItem(TOKEN_KEY, data.token)
+  void notifyLogin(data.token as string)
   return data.token as string
 }
 

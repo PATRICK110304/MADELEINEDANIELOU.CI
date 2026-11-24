@@ -12,6 +12,8 @@ import { getDb } from '../db.js'
 import { cleanString } from '../middleware/sanitize.js'
 import { requireAuth } from '../middleware/auth.js'
 import { supabaseAuthEnabled } from '../services/supabase.js'
+import { notifyAdmin } from '../services/notify.js'
+import { logAudit } from '../services/audit.js'
 
 const router = Router()
 
@@ -55,6 +57,26 @@ router.post('/login', loginLimiter, async (req, res) => {
     expiresIn: config.jwtExpiresIn,
   })
   res.json({ token, email: user.email })
+})
+
+/* Anti-spam sur les notifications (max 5 / 10 min / IP) */
+const notifyLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+})
+
+/* ---------- Alerte de connexion (appelée par le client après login) ---------- */
+router.post('/notify-login', notifyLimiter, requireAuth, async (req, res) => {
+  const email = req.admin?.email || 'administrateur'
+  const date = new Date().toLocaleString('fr-FR', { timeZone: 'Africa/Abidjan' })
+  const ip = req.ip || 'inconnue'
+  const device = String(req.headers['user-agent'] || 'inconnu').slice(0, 120)
+  const message = `Connexion à l'espace d'administration GSMD\nCompte : ${email}\nDate : ${date}\nIP : ${ip}\nAppareil : ${device}`
+  await logAudit('connexion_admin', email, `${ip} — ${device}`)
+  const channels = await notifyAdmin('Connexion administrateur', message)
+  res.json({ ok: true, channels })
 })
 
 /* ---------- Profil connecté (protegé) ---------- */

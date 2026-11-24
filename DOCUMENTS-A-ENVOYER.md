@@ -127,3 +127,20 @@ Cordialement,
 - [ ] `RAPPORT-FINAL.md` (ce qui a été fait et ce qui reste, à donner en pièce jointe si tu veux être transparent)
 - [ ] Accès admin : **ne jamais envoyer le mot de passe par email** — créer le compte directement dans Supabase Auth et donner le mode opératoire oralement ou via un lien de réinitialisation.
 - [ ] Attestation d'hébergement / domaine : à demander à ton fournisseur une fois le domaine installé.
+
+
+## 7. Sans comptable — à lire avant d'envoyer la facture
+
+Voir le document Word **`05-Facturation-sans-comptable.docx`** sur ton Bureau.
+En résumé : demande d'abord à l'école si elle exige un **NIF** pour payer. Si oui,
+obtiens-le auprès de la **DGI (dgi.ci)** avant de facturer. Si non, indique
+« NIF en cours d'attribution » et « TVA non applicable en l'absence
+d'assujettissement » — mais fais confirmer ces mentions par la DGI.
+Ne jamais inventer de NIF ni de numéro de TVA.
+
+## 8. Alerte de connexion admin
+
+Voir le document Word **`06-Securisation-et-alertes.docx`**. Une notification est
+maintenant envoyée à chaque connexion (email Resend, webhook, WhatsApp Twilio ou
+appel, selon les variables renseignées). Les identifiants de ces services doivent
+être saisis dans les **secrets Fly.io**, jamais dans le chat.

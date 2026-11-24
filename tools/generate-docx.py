@@ -224,6 +224,85 @@ bullets(d, [
 ])
 d.save(f'{OUT}/04-Tarifs-et-abonnements.docx')
 
+
+# ---------------------------------------------------------------- 5
+d = base('5. Facturation sans comptable', 'Démarche pratique — informations générales, à confirmer auprès de la DGI (dgi.ci).')
+d.add_heading('1. Première vérification à faire', 2)
+bullets(d, [
+    'Demander au secrétariat de l’école si elle exige un NIF (numéro d’identification fiscale) pour régler un prestataire. Les établissements paient souvent par virement et le demandent.',
+    'Si un NIF est exigé : le demander à la DGI (dgi.ci ou centre des impôts le plus proche) AVANT d’envoyer la facture. Je n’en invente aucun.',
+    'Si aucun NIF n’est exigé : émettre une facture avec la mention « NIF en cours d’attribution » et la régulariser dès obtention.',
+    'Se renseigner sur le régime adapté (entreprise individuelle / auto-entrepreneur) directement auprès de la DGI : les conditions et pièces varient.',
+])
+d.add_heading('2. Modèle de facture sans NIF (à adapter)', 2)
+table(d, ['Champ', 'Valeur à renseigner'], [
+    ['Facture n°', '[ANNÉE-001] du [DATE]'],
+    ['Prestataire', '[VOTRE NOM OU RAISON SOCIALE]'],
+    ['Adresse / téléphone / email', '[VOS COORDONNÉES]'],
+    ['NIF', 'NIF en cours d’attribution — à fournir dès obtention'],
+    ['Client', 'Groupe Scolaire Madeleine-Daniélou Abidjan'],
+    ['Désignation', 'Développement et mise en ligne du site institutionnel (12 mois tout compris)'],
+    ['Montant HT', '[………] FCFA'],
+    ['TVA', 'TVA non applicable en l’absence d’assujettissement — à confirmer'],
+    ['Total TTC à payer', '450 000 FCFA (option recommandée)'],
+    ['Paiement', 'Virement / espèces / mobile money — [MODALITÉS]'],
+], [4.6, 14.4])
+d.add_heading('3. À faire après encaissement', 2)
+bullets(d, [
+    'Conserver une copie du devis signé, de la facture et de la preuve de paiement.',
+    'Déclarer le revenu selon le régime communiqué par la DGI.',
+    'En cas de contrôle, présenter ces pièces : elles prouvent la prestation et la date.',
+    'Mettre à jour la facture avec le NIF dès qu’il est attribué.',
+])
+d.add_heading('4. Ce que je ne peux pas décider à ta place', 2)
+bullets(d, [
+    'Ton statut juridique et ton numéro fiscal : ils dépendent de ton dossier personnel.',
+    'Le taux de TVA applicable : à confirmer auprès de la DGI.',
+    'La mention exacte à utiliser en l’absence de NIF : à valider avec le centre des impôts.',
+])
+d.add_paragraph('Ce document est une aide pratique, pas un avis comptable ou fiscal. Pour une somme de ce montant, un seul échange avec la DGI ou un centre de gestion agréé peut sécuriser toute la démarche.')
+d.save(f'{OUT}/05-Facturation-sans-comptable.docx')
+
+# ---------------------------------------------------------------- 6
+d = base('6. Sécurisation et alertes de connexion', 'Notification à chaque connexion à l’espace administration GSMD.')
+d.add_paragraph('Une alerte est désormais envoyée lorsqu’un administrateur se connecte. Le message contient uniquement : le compte, la date, l’adresse IP et le type d’appareil. Jamais de mot de passe ni de jeton.')
+d.add_heading('1. Options de notification', 2)
+table(d, ['Option', 'Coût', 'Avantages', 'Inconvénients'], [
+    ['Email via Resend', 'Gratuit dans le quota', 'Déjà configuré, fiable, historique dans la boîte mail', 'Nécessite le domaine vérifié dans Resend'],
+    ['Webhook (CallMeBot / Zapier / Make)', 'Gratuit ou selon service', 'Simple à brancher, possible WhatsApp', 'Service non officiel pour WhatsApp, fiabilité variable'],
+    ['Twilio WhatsApp', 'Payant (à l’usage)', 'API WhatsApp officielle, fiable', 'Compte Twilio + numéro, coût par message'],
+    ['Twilio appel vocal', 'Payant (à l’usage)', 'Appel immédiat en cas de connexion', 'Coût par minute, nécessite un numéro'],
+    ['Journal d’audit seul', 'Inclus', 'Aucune dépendance externe', 'Aucune alerte en temps réel'],
+], [4.4, 3.2, 6.4, 6.0])
+d.add_heading('2. Ce que l’école doit décider', 2)
+bullets(d, [
+    'Qui reçoit l’alerte (email et/ou numéro WhatsApp et/ou numéro d’appel).',
+    'Quel canal retenir : gratuit (email/webhook) ou payant officiel (Twilio).',
+    'Si un appel est souhaité en plus du message.',
+])
+d.add_heading('3. Ce que tu dois me transmettre (jamais dans le chat)', 2)
+bullets(d, [
+    'Email de réception : à écrire toi-même dans ADMIN_NOTIFY_EMAIL via les secrets Fly.',
+    'Webhook : l’URL complète fournie par ton service (CallMeBot/Zapier/Make).',
+    'Twilio : Account SID, Auth Token, numéros From/To — à saisir dans les secrets Fly, pas dans un email.',
+    'Commande : flyctl secrets set ADMIN_NOTIFY_EMAIL="..." -a madeleinedanielou-api',
+])
+d.add_heading('4. Vérification après configuration', 2)
+bullets(d, [
+    'Se connecter une fois à /admin/dashboard.',
+    'Vérifier la réception du message ou de l’appel.',
+    'Contrôler la ligne « connexion_admin » dans la table public.audit_log (Supabase).',
+    'Ne jamais transmettre le mot de passe admin par WhatsApp : utiliser un lien de réinitialisation Supabase.',
+])
+d.add_heading('5. Sécurité déjà en place', 2)
+bullets(d, [
+    'Authentification Supabase Auth (JWT vérifié côté serveur à chaque requête).',
+    'Limitation des tentatives de connexion et des notifications.',
+    'Page /admin en noindex, secrets hors du dépôt, Helmet et CORS strict.',
+    'Journal d’audit des consultations et exports.',
+])
+d.save(f'{OUT}/06-Securisation-et-alertes.docx')
+
 print('Documents créés dans', OUT)
 for f in sorted(os.listdir(OUT)):
     print(' -', f, os.path.getsize(os.path.join(OUT, f)), 'octets')
