@@ -144,3 +144,13 @@ Voir le document Word **`06-Securisation-et-alertes.docx`**. Une notification es
 maintenant envoyée à chaque connexion (email Resend, webhook, WhatsApp Twilio ou
 appel, selon les variables renseignées). Les identifiants de ces services doivent
 être saisis dans les **secrets Fly.io**, jamais dans le chat.
+
+
+## 9. Coordonnées du développeur (ajoutées en bas des 7 documents Word)
+
+- Gmail : patrickndri120@gmail.com
+- Portfolio : https://patrickdev-portfolio.vercel.app
+- GitHub : https://github.com/PATRICK110304
+- LinkedIn : [VOTRE URL LINKEDIN — À TRANSMETTRE]
+
+Ces coordonnées sont déduites de ses comptes de travail : à confirmer avant envoi.

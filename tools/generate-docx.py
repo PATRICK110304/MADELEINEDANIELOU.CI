@@ -345,6 +345,27 @@ bullets(d, [
 ])
 d.save(f'{OUT}/07-Protection-IA-et-Cloudflare.docx')
 
+
+def add_dev_contact(path):
+    d = Document(path)
+    if any('Coordonnées du développeur' in p.text for p in d.paragraphs):
+        return
+    d.add_heading('Coordonnées du développeur', 2)
+    table(d, ['Canal', 'Coordonnées'], [
+        ['Gmail', 'patrickndri120@gmail.com'],
+        ['Portfolio', 'https://patrickdev-portfolio.vercel.app'],
+        ['GitHub', 'https://github.com/PATRICK110304'],
+        ['LinkedIn', '[VOTRE URL LINKEDIN — À TRANSMETTRE]'],
+    ], [4, 15])
+    p = d.add_paragraph('Renseignements à confirmer par le développeur avant envoi.')
+    p.runs[0].italic = True
+    p.runs[0].font.size = Pt(9)
+    d.save(path)
+
+for fname in os.listdir(OUT):
+    if fname.endswith('.docx'):
+        add_dev_contact(os.path.join(OUT, fname))
+
 print('Documents créés dans', OUT)
 for f in sorted(os.listdir(OUT)):
     print(' -', f, os.path.getsize(os.path.join(OUT, f)), 'octets')
