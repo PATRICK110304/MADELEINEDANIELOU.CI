@@ -78,3 +78,5 @@ router.get('/alert/:token/allow', async (req, res) => {
 })
 
 
+
+export default router
