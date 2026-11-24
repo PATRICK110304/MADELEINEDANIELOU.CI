@@ -1,9 +1,6 @@
 from docx import Document
 from docx.shared import Pt, Cm, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.enum.table import WD_TABLE_ALIGNMENT
-from docx.oxml.ns import qn
-from docx.oxml import OxmlElement
 import os
 
 OUT = os.environ.get('GSMD_DOCS_DIR', '/home/patrick/Bureau/Documents-GSMD')
@@ -12,15 +9,6 @@ os.makedirs(OUT, exist_ok=True)
 BLEU = RGBColor(0x0B, 0x5C, 0xA0)
 CORAIL = RGBColor(0xD9, 0x53, 0x2B)
 GRIS = RGBColor(0x55, 0x5B, 0x66)
-
-
-def shade(cell, hexcolor):
-    tcPr = cell._tc.get_or_add_tcPr()
-    shd = OxmlElement('w:shd')
-    shd.set(qn('w:val'), 'clear')
-    shd.set(qn('w:color'), 'auto')
-    shd.set(qn('w:fill'), hexcolor)
-    tcPr.append(shd)
 
 
 def base(title, subtitle):
@@ -54,55 +42,38 @@ def base(title, subtitle):
     return d
 
 
-def table(d, headers, rows, widths=None):
-    t = d.add_table(rows=1, cols=len(headers))
-    t.style = 'Table Grid'
-    t.alignment = WD_TABLE_ALIGNMENT.CENTER
-    hdr = t.rows[0].cells
-    for i, h in enumerate(headers):
-        hdr[i].text = ''
-        run = hdr[i].paragraphs[0].add_run(h)
-        run.bold = True
-        run.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
-        run.font.size = Pt(9)
-        shade(hdr[i], '0B5CA0')
-    for row in rows:
-        cells = t.add_row().cells
-        for i, val in enumerate(row):
-            cells[i].text = ''
-            run = cells[i].paragraphs[0].add_run(str(val))
-            run.font.size = Pt(9)
-    if widths:
-        for row in t.rows:
-            for i, w in enumerate(widths):
-                row.cells[i].width = Cm(w)
-    d.add_paragraph()
-    return t
-
-
 def bullets(d, items):
     for it in items:
         d.add_paragraph(it, style='List Bullet')
 
 
+def contact(d):
+    d.add_heading('Coordonnées du développeur', 2)
+    bullets(d, [
+        'Gmail : patrickndri120@gmail.com',
+        'Portfolio : https://patrickdev-portfolio.vercel.app',
+        'GitHub : https://github.com/PATRICK110304',
+        'LinkedIn : [VOTRE URL LINKEDIN — À TRANSMETTRE]',
+        'Renseignements à confirmer avant envoi.',
+    ])
+
+
 # ---------------------------------------------------------------- 1
-d = base('1. Connexions et accès', 'À remplir par le développeur lors de la remise — ne jamais inscrire de mot de passe dans ce document.')
+d = base('1. Connexions et accès', 'À remplir lors de la remise — ne jamais inscrire de mot de passe.')
 d.add_heading('1. Accès au site', 2)
-table(d, ['Service', 'Adresse', 'Connexion nécessaire', 'Identifiant'], [
-    ['Site public', 'https://madeleinedanielou.vercel.app', 'Non', '—'],
-    ['Espace administration', 'https://madeleinedanielou.vercel.app/admin/dashboard', 'Oui (Supabase Auth)', 'admin@madeleinedanielou.ci'],
-    ['API (monitoring)', 'https://madeleinedanielou-api.fly.dev/api/health', 'Non', '—'],
-], [4, 6.2, 3.6, 4.2])
-
+bullets(d, [
+    'Site public : https://madeleinedanielou.vercel.app — aucune connexion requise.',
+    'Espace administration : https://madeleinedanielou.vercel.app/admin/dashboard — connexion Supabase Auth, identifiant admin@madeleinedanielou.ci.',
+    'API monitoring : https://madeleinedanielou-api.fly.dev/api/health — aucune connexion requise.',
+])
 d.add_heading('2. Comptes propriétaires à transférer à l’école', 2)
-table(d, ['Service', 'URL du tableau de bord', 'Ce que l’école y trouve', 'Transféré (oui/non)'], [
-    ['Vercel (site)', 'https://vercel.com/angelin-projet/madeleinedanielou', 'Déploiements, domaine, variables VITE_*', '☐'],
-    ['Fly.io (API)', 'https://fly.io/apps/madeleinedanielou-api', 'Machines, secrets, logs, redémarrage', '☐'],
-    ['Supabase', 'https://supabase.com/dashboard/project/ldvzwxhscuppqpqrgnmf', 'Utilisateurs Auth, tables, journal d’audit', '☐'],
-    ['Resend', 'https://resend.com/domains', 'Domaine vérifié, clés API, emails envoyés', '☐'],
-    ['Registrar du domaine', '[URL du registrar]', 'Gestion DNS du nom de domaine', '☐'],
-], [3, 5.4, 6.2, 3.2])
-
+bullets(d, [
+    'Vercel — https://vercel.com/angelin-projet/madeleinedanielou — déploiements, domaine, variables VITE_* — transféré : ☐',
+    'Fly.io — https://fly.io/apps/madeleinedanielou-api — machines, secrets, logs, redémarrage — transféré : ☐',
+    'Supabase — https://supabase.com/dashboard/project/ldvzwxhscuppqpqrgnmf — utilisateurs Auth, tables, journal d’audit — transféré : ☐',
+    'Resend — https://resend.com/domains — domaine vérifié, clés API, emails envoyés — transféré : ☐',
+    'Registrar du domaine — [URL du registrar] — gestion DNS — transféré : ☐',
+])
 d.add_heading('3. Procédure de connexion à l’administration', 2)
 bullets(d, [
     'Ouvrir https://madeleinedanielou.vercel.app/admin/dashboard',
@@ -111,110 +82,113 @@ bullets(d, [
     'Le mot de passe ne doit jamais être envoyé par email ni inscrit dans un document partagé.',
     'Se déconnecter via le bouton « Déconnexion » en bas du menu latéral.',
 ])
-
 d.add_heading('4. Règles de sécurité', 2)
 bullets(d, [
     'Ne jamais communiquer la clé secrète Resend, la chaîne DATABASE_URL ni les tokens Fly/Vercel.',
     'Ces valeurs sont stockées dans les secrets Fly.io et dans le dashboard Supabase.',
-    'Régénérer la clé Resend (elle a été partagée dans un chat) puis mettre à jour le secret Fly.',
+    'Régénérer la clé Resend (partagée dans un chat) puis mettre à jour le secret Fly.',
     'Activer les rôles (direction / secrétariat / communication) avec ADMIN_ROLES et app_metadata.role.',
     'Conserver le journal d’audit public.audit_log (consultations et exports).',
 ])
-
 d.add_heading('5. Attestation de remise', 2)
-table(d, ['Élément remis', 'Destinataire', 'Date', 'Signature'], [
-    ['Lien du site et accès admin', '', '', ''],
-    ['Comptes propriétaires (Vercel/Fly/Supabase/Resend)', '', '', ''],
-    ['Nom de domaine et DNS', '', '', ''],
-], [7, 4, 3, 4])
+bullets(d, [
+    'Lien du site et accès admin — destinataire : ___ — date : ___ — signature : ___',
+    'Comptes propriétaires (Vercel/Fly/Supabase/Resend) — destinataire : ___ — date : ___ — signature : ___',
+    'Nom de domaine et DNS — destinataire : ___ — date : ___ — signature : ___',
+])
+contact(d)
 d.save(f'{OUT}/01-Connexions-et-acces.docx')
 
 # ---------------------------------------------------------------- 2
-d = base('2. Fonctionnalités à ajouter', 'Éléments restants après la mise en ligne — à valider avec la direction.')
-d.add_paragraph('Priorités : P1 = à faire avant la communication officielle, P2 = à prévoir, P3 = confort.')
-rows = [
-    ['F1', 'Corriger l’histoire du site', 'P1', '1913 (Communauté), 1962 à Adjamé, inauguration le 15/01/2021', 'Direction / ancien site'],
-    ['F2', 'Corriger les horaires', 'P1', '7h30–17h00, pause 12h45–13h45 ; supprimer 7h–16h', 'Secrétariat'],
-    ['F3', 'Remplacer le « Mot de la Direction »', 'P1', 'Texte officiel à fournir', 'Direction'],
-    ['F4', 'Menu de la cantine à jour', 'P1', 'Semaine 16–20/11/2026 + mise à jour chaque lundi', 'Secrétariat'],
-    ['F5', 'Bloquer les classes indisponibles', 'P1', 'CE2, CM1, 6e–3e, Terminale indisponibles selon la source', 'Secrétariat'],
-    ['F6', 'Remplacer PDF et audios de démonstration', 'P1', 'Fiches, règlements et épisodes réels', 'Secrétariat'],
-    ['F7', 'Compléter réseau et partenaires', 'P1', 'Rome retiré, Cocody/Ermont ajoutés, Prosuma, NSIA, Nexans, DCC, Guilde, TBC', 'Communication'],
-    ['F8', 'Ajouter les albums annuels', 'P2', '2023-2024, 2024-2025, 2025-2026', 'Communication'],
-    ['F9', 'Ajouter le planning des inscriptions', 'P2', 'PDF 2026-2027 depuis l’ancien site', 'Secrétariat'],
-    ['F10', 'Mettre en place les rôles admin', 'P1', 'direction / secrétariat / communication', 'Direction'],
-    ['F11', 'Module « Actualités » dans l’admin', 'P2', 'Créer/éditer une actualité sans passer par le code', 'Développeur'],
-    ['F12', 'Finaliser les détails admin', 'P2', 'Deep-link des onglets, chargement du bouton de connexion', 'Développeur'],
-    ['F13', 'Améliorer le formulaire', 'P2', 'name/autocomplete, focus premier champ invalide, aria-live', 'Développeur'],
-    ['F14', 'Détails mobiles/accessibilité', 'P3', 'safe-area, overscroll, transition-all, reduced-motion', 'Développeur'],
-    ['F15', 'Domaine + Resend vérifié', 'P1', 'DNS, SPF/DKIM/DMARC, emails délivrés', 'Développeur + registrar'],
-    ['F16', 'Déclaration ARTCI / droit à l’image', 'P1', 'Récépissé et autorisations à fournir', 'Direction'],
-]
-table(d, ['N°', 'Fonctionnalité / correction', 'Priorité', 'Description', 'Responsable'], rows, [1.2, 4.4, 1.8, 7.2, 3.4])
+d = base('2. Fonctionnalités à ajouter', 'Éléments restants — à valider avec la direction.')
+d.add_paragraph('Priorités : P1 = avant la communication officielle, P2 = à prévoir, P3 = confort.')
+d.add_heading('Priorité P1', 2)
+bullets(d, [
+    'F1 — Corriger l’histoire : 1913 (Communauté), 1962 à Adjamé, inauguration le 15/01/2021. Responsable : Direction.',
+    'F2 — Corriger les horaires : 7h30–17h00, pause 12h45–13h45 ; supprimer 7h–16h. Responsable : Secrétariat.',
+    'F3 — Remplacer le « Mot de la Direction » par le texte officiel. Responsable : Direction.',
+    'F4 — Menu de la cantine à jour : semaine 16–20/11/2026 et mise à jour chaque lundi. Responsable : Secrétariat.',
+    'F5 — Bloquer les classes indisponibles : CE2, CM1, 6e–3e, Terminale. Responsable : Secrétariat.',
+    'F6 — Remplacer les PDF et audios de démonstration par les fichiers officiels. Responsable : Secrétariat.',
+    'F7 — Compléter réseau et partenaires : Rome retiré, Cocody/Ermont ajoutés, Prosuma, NSIA, Nexans, DCC, Guilde, TBC. Responsable : Communication.',
+    'F10 — Mettre en place les rôles admin : direction / secrétariat / communication. Responsable : Direction.',
+    'F15 — Domaine et Resend vérifié : DNS, SPF/DKIM/DMARC, emails délivrés. Responsable : Développeur + registrar.',
+    'F16 — Déclaration ARTCI et autorisations de droit à l’image. Responsable : Direction.',
+])
+d.add_heading('Priorité P2', 2)
+bullets(d, [
+    'F8 — Ajouter les albums annuels 2023-2024, 2024-2025, 2025-2026. Responsable : Communication.',
+    'F9 — Ajouter le planning des inscriptions 2026-2027 (PDF source). Responsable : Secrétariat.',
+    'F11 — Module « Actualités » dans l’admin : créer/éditer sans passer par le code. Responsable : Développeur.',
+    'F12 — Finaliser les détails admin : deep-link des onglets, chargement du bouton de connexion. Responsable : Développeur.',
+    'F13 — Améliorer le formulaire : name/autocomplete, focus premier champ invalide, aria-live. Responsable : Développeur.',
+])
+d.add_heading('Priorité P3', 2)
+bullets(d, [
+    'F14 — Détails mobiles et accessibilité : safe-area, overscroll, transition-all, reduced-motion. Responsable : Développeur.',
+])
 d.add_heading('Notes', 2)
 bullets(d, [
-    'Aucune information n’a été inventée : les éléments ci-dessus viennent du site officiel ou du diagnostic technique.',
+    'Aucune information n’a été inventée : tout vient du site officiel ou du diagnostic technique.',
     'Chaque élément validé par l’école peut être intégré sans refaire le site.',
     'Les montants et abonnements sont détaillés dans le document 04.',
 ])
+contact(d)
 d.save(f'{OUT}/02-Fonctionnalites-a-ajouter.docx')
 
 # ---------------------------------------------------------------- 3
 d = base('3. Documents à fournir', 'Pièces à demander à l’école — checklist à cocher lors de l’entretien.')
-rows = [
-    ['Nom de domaine exact + gestionnaire DNS', 'Direction / registrar', 'Facture ou espace « Domaines » du registrar', 'Installation du domaine', '☐'],
-    ['Nom et qualité du directeur de publication', 'Direction', 'Statuts / registre de l’association', 'Mentions légales', '☐'],
-    ['Coordonnées de l’hébergeur actuel', 'Direction / comptabilité', 'Facture ou contrat d’hébergement', 'Mentions légales', '☐'],
-    ['Durées de conservation', 'Secrétariat / direction', 'Règlement intérieur ou note de direction', 'Politique de confidentialité', '☐'],
-    ['Récépissé de déclaration ARTCI', 'Direction', 'Dossier administratif (numéro + date)', 'Conformité', '☐'],
-    ['Autorisations de droit à l’image', 'Secrétariat', 'Dossiers parents (site web + réseaux)', 'Légalité des photos', '☐'],
-    ['Vrai mot de la Direction', 'Direction', 'Texte officiel', 'Page « Qui sommes-nous »', '☐'],
-    ['Vrais PDF et fichiers audio', 'Secrétariat', 'Fiches, règlements, épisodes', 'Documents et Web Radio', '☐'],
-    ['Planning inscriptions 2026-2027', 'Secrétariat', 'PDF de l’ancien site', 'Page Scolarité', '☐'],
-    ['URL Facebook officielle', 'Communication', 'Ancien site / page Facebook', 'Footer et contact', '☐'],
-    ['Liste des partenaires + statut UNESCO', 'Communication', 'Page « Partenaires » de l’ancien site', 'Page Partenaires', '☐'],
-    ['Rôles admin et emails associés', 'Direction', 'Décision de la direction', 'Comptes Supabase Auth', '☐'],
-    ['Adresse d’expédition des emails', 'Direction', 'Boîte groupescolaire@madeleinedanielou.ci', 'Resend / formulaire contact', '☐'],
-]
-table(d, ['Document / information', 'À demander à', 'Où le trouver', 'Utilisé pour', 'Reçu'], rows, [5.4, 3.2, 4.8, 4.2, 1.4])
+d.add_heading('Pièces à demander', 2)
+bullets(d, [
+    'Nom de domaine exact et gestionnaire DNS — à demander à : Direction / registrar — où le trouver : facture ou espace « Domaines » — utilisé pour : installation du domaine — reçu : ☐',
+    'Nom et qualité du directeur de publication — Direction — statuts / registre de l’association — mentions légales — reçu : ☐',
+    'Coordonnées de l’hébergeur actuel — Direction / comptabilité — facture ou contrat d’hébergement — mentions légales — reçu : ☐',
+    'Durées de conservation — Secrétariat / direction — règlement intérieur ou note de direction — politique de confidentialité — reçu : ☐',
+    'Récépissé de déclaration ARTCI — Direction — dossier administratif (numéro + date) — conformité — reçu : ☐',
+    'Autorisations de droit à l’image — Secrétariat — dossiers parents (site web + réseaux) — légalité des photos — reçu : ☐',
+    'Vrai mot de la Direction — Direction — texte officiel — page « Qui sommes-nous » — reçu : ☐',
+    'Vrais PDF et fichiers audio — Secrétariat — fiches, règlements, épisodes — documents et Web Radio — reçu : ☐',
+    'Planning des inscriptions 2026-2027 — Secrétariat — PDF de l’ancien site — page Scolarité — reçu : ☐',
+    'URL Facebook officielle — Communication — ancien site / page Facebook — footer et contact — reçu : ☐',
+    'Liste des partenaires et statut UNESCO — Communication — page « Partenaires » de l’ancien site — page Partenaires — reçu : ☐',
+    'Rôles admin et emails associés — Direction — décision de la direction — comptes Supabase Auth — reçu : ☐',
+    'Adresse d’expédition des emails — Direction — boîte groupescolaire@madeleinedanielou.ci — Resend / formulaire contact — reçu : ☐',
+])
 d.add_heading('À remettre de ton côté', 2)
 bullets(d, [
     'Le lien du site : https://madeleinedanielou.vercel.app',
     'Le devis et la facture (document 04).',
-    'Les accès administrateurs via un lien de réinitialisation — jamais par email avec le mot de passe en clair.',
+    'Les accès administrateurs via un lien de réinitialisation — jamais le mot de passe par email.',
     'Une attestation d’hébergement et de domaine une fois le domaine installé.',
 ])
+contact(d)
 d.save(f'{OUT}/03-Documents-a-fournir.docx')
 
 # ---------------------------------------------------------------- 4
 d = base('4. Tarifs et abonnements', 'Montants indicatifs à confirmer — devis à faire valider par un comptable.')
 d.add_heading('1. Prix de développement proposés', 2)
-table(d, ['Option', 'Montant TTC conseillé', 'Ce que l’école paie'], [
-    ['A. Développement seul', '300 000 FCFA', 'Elle règle à part le domaine et l’hébergement (~50–80 000 FCFA/an, à vérifier)'],
-    ['B. Tout compris 12 mois (recommandé)', '450 000 FCFA', 'Rien d’autre pendant 12 mois : domaine, hébergement, base, emails inclus'],
-    ['C. Tout compris + formation + suivi 1 an', '600 000 FCFA', 'Rien d’autre, avec 2 h de formation au secrétariat'],
-], [5.4, 3.8, 9.8])
-d.add_paragraph('Reconduction estimée à partir de l’année 2 : 50 000 à 80 000 FCFA/an (domaine + infrastructure).')
-
+bullets(d, [
+    'Option A — Développement seul : 300 000 FCFA TTC. L’école règle à part le domaine et l’hébergement (~50 000–80 000 FCFA/an, à vérifier).',
+    'Option B — Tout compris 12 mois (recommandé) : 450 000 FCFA TTC. L’école ne paie rien d’autre : domaine, hébergement, base, emails inclus.',
+    'Option C — Tout compris + formation + suivi 1 an : 600 000 FCFA TTC. Rien d’autre, avec 2 h de formation au secrétariat.',
+    'Reconduction à partir de l’année 2 : 50 000 à 80 000 FCFA/an (domaine + infrastructure).',
+])
 d.add_heading('2. Solutions gratuites', 2)
-table(d, ['Service', 'Ce que ça apporte', 'Avantages', 'Inconvénients / limites'], [
-    ['Vercel Hobby', 'Hébergement du site React', 'Gratuit, déploiement automatique depuis GitHub, HTTPS', 'Usage non commercial selon les conditions ; à vérifier pour une école'],
-    ['Supabase Free', 'Base PostgreSQL + Auth', 'Gratuit, tableau de bord complet, JWT', 'Quotas limités (base, bande passante, emails Auth) ; à confirmer'],
-    ['Resend Free', 'Envoi des emails du formulaire', 'Gratuit jusqu’à un certain volume mensuel', 'Domaine à vérifier quand même ; quota quotidien'],
-    ['Dépôt GitHub public', 'Sauvegarde du code et historique', 'Gratuit, traçabilité des modifications', 'Le code est visible par tous si le dépôt est public'],
-], [3.4, 4.4, 5.4, 5.8])
-
+bullets(d, [
+    'Vercel Hobby — hébergement du site React — avantages : gratuit, déploiement automatique depuis GitHub, HTTPS — limite : usage non commercial selon les conditions, à vérifier pour une école.',
+    'Supabase Free — base PostgreSQL et Auth — avantages : gratuit, tableau de bord complet, JWT — limite : quotas (base, bande passante, emails Auth) à confirmer.',
+    'Resend Free — emails du formulaire — avantages : gratuit jusqu’à un certain volume — limite : domaine à vérifier quand même, quota quotidien.',
+    'Dépôt GitHub public — sauvegarde du code — avantages : gratuit, historique des modifications — limite : code visible par tous.',
+])
 d.add_heading('3. Solutions payantes', 2)
-table(d, ['Service', 'Coût indicatif', 'Avantages'], [
-    ['Vercel Pro', '~20 USD / membre / mois (à vérifier)', 'Usage commercial, domaines multiples, analytics, meilleurs quotas'],
-    ['Supabase Pro', '~25 USD / mois (à vérifier)', 'Base plus large, sauvegardes étendues, support, projets multiples'],
-    ['Resend Pro', '~20 USD / mois (à vérifier)', 'Volume d’emails plus élevé, plusieurs domaines, support'],
-    ['Fly.io (API)', 'Quelques USD / mois pour 1 machine partagée', 'API Node toujours disponible, logs, redémarrage automatique ; pas de plan gratuit permanent'],
-    ['Nom de domaine .ci', '~10 000–30 000 FCFA / an (selon registrar)', 'Adresse institutionnelle crédible, email au nom de l’école'],
-    ['Cloudinary (option)', 'Offre gratuite limitée puis forfaits', 'Stockage cloud des photos, transformation WebP automatique'],
-], [3.4, 4.4, 11.2])
-d.add_paragraph('Les tarifs ci-dessus sont indicatifs : ils doivent être vérifiés sur les sites officiels au moment de la facturation.')
-
+bullets(d, [
+    'Vercel Pro — ~20 USD / membre / mois (à vérifier) — avantages : usage commercial, domaines multiples, analytics, meilleurs quotas.',
+    'Supabase Pro — ~25 USD / mois (à vérifier) — avantages : base plus large, sauvegardes étendues, support.',
+    'Resend Pro — ~20 USD / mois (à vérifier) — avantages : volume d’emails plus élevé, plusieurs domaines, support.',
+    'Fly.io (API) — quelques USD / mois pour 1 machine partagée — avantages : API toujours disponible, logs, redémarrage automatique ; pas de plan gratuit permanent.',
+    'Nom de domaine .ci — ~10 000–30 000 FCFA / an (selon registrar) — avantages : adresse institutionnelle, email au nom de l’école.',
+    'Cloudinary (option) — offre gratuite limitée puis forfaits — avantages : stockage cloud des photos, transformation WebP automatique.',
+])
 d.add_heading('4. Recommandation', 2)
 bullets(d, [
     'Option B — 450 000 FCFA tout compris 12 mois : l’école n’a rien à payer de supplémentaire et le domaine porte son nom.',
@@ -222,76 +196,78 @@ bullets(d, [
     'Prévoir une reconduction de 50 000 à 80 000 FCFA/an à partir de l’année 2.',
     'Faire valider TVA, NIF et mentions légales par un comptable avant d’émettre la facture.',
 ])
+contact(d)
 d.save(f'{OUT}/04-Tarifs-et-abonnements.docx')
 
-
 # ---------------------------------------------------------------- 5
-d = base('5. Facturation sans comptable', 'Démarche pratique — informations générales, à confirmer auprès de la DGI (dgi.ci).')
-d.add_heading('1. Première vérification à faire', 2)
+d = base('5. Facturation sans comptable', 'Démarche pratique — à confirmer auprès de la DGI (dgi.ci).')
+d.add_heading('1. Première vérification', 2)
 bullets(d, [
-    'Demander au secrétariat de l’école si elle exige un NIF (numéro d’identification fiscale) pour régler un prestataire. Les établissements paient souvent par virement et le demandent.',
-    'Si un NIF est exigé : le demander à la DGI (dgi.ci ou centre des impôts le plus proche) AVANT d’envoyer la facture. Je n’en invente aucun.',
-    'Si aucun NIF n’est exigé : émettre une facture avec la mention « NIF en cours d’attribution » et la régulariser dès obtention.',
-    'Se renseigner sur le régime adapté (entreprise individuelle / auto-entrepreneur) directement auprès de la DGI : les conditions et pièces varient.',
+    'Demander à l’école si elle exige un NIF pour payer un prestataire. Les établissements paient souvent par virement et le demandent.',
+    'Si un NIF est exigé : le demander à la DGI avant d’envoyer la facture. Je n’en invente aucun.',
+    'Si aucun NIF n’est exigé : facture avec la mention « NIF en cours d’attribution », à régulariser dès obtention.',
+    'Se renseigner sur le régime adapté (entreprise individuelle / auto-entrepreneur) directement à la DGI.',
 ])
-d.add_heading('2. Modèle de facture sans NIF (à adapter)', 2)
-table(d, ['Champ', 'Valeur à renseigner'], [
-    ['Facture n°', '[ANNÉE-001] du [DATE]'],
-    ['Prestataire', '[VOTRE NOM OU RAISON SOCIALE]'],
-    ['Adresse / téléphone / email', '[VOS COORDONNÉES]'],
-    ['NIF', 'NIF en cours d’attribution — à fournir dès obtention'],
-    ['Client', 'Groupe Scolaire Madeleine-Daniélou Abidjan'],
-    ['Désignation', 'Développement et mise en ligne du site institutionnel (12 mois tout compris)'],
-    ['Montant HT', '[………] FCFA'],
-    ['TVA', 'TVA non applicable en l’absence d’assujettissement — à confirmer'],
-    ['Total TTC à payer', '450 000 FCFA (option recommandée)'],
-    ['Paiement', 'Virement / espèces / mobile money — [MODALITÉS]'],
-], [4.6, 14.4])
-d.add_heading('3. À faire après encaissement', 2)
+d.add_heading('2. Modèle de facture sans NIF', 2)
+for line in [
+    'Facture n° [ANNÉE-001] du [DATE]',
+    'Prestataire : [VOTRE NOM OU RAISON SOCIALE]',
+    'Adresse / téléphone / email : [VOS COORDONNÉES]',
+    'NIF : NIF en cours d’attribution — à fournir dès obtention',
+    'Client : Groupe Scolaire Madeleine-Daniélou Abidjan',
+    'Désignation : développement et mise en ligne du site institutionnel (12 mois tout compris)',
+    'Montant HT : [………] FCFA',
+    'TVA : TVA non applicable en l’absence d’assujettissement — à confirmer',
+    'Total TTC à payer : 450 000 FCFA (option recommandée)',
+    'Paiement : virement / espèces / mobile money — [MODALITÉS]',
+]:
+    p = d.add_paragraph(line)
+    p.paragraph_format.left_indent = Cm(0.8)
+d.add_heading('3. Après encaissement', 2)
 bullets(d, [
     'Conserver une copie du devis signé, de la facture et de la preuve de paiement.',
     'Déclarer le revenu selon le régime communiqué par la DGI.',
-    'En cas de contrôle, présenter ces pièces : elles prouvent la prestation et la date.',
     'Mettre à jour la facture avec le NIF dès qu’il est attribué.',
 ])
 d.add_heading('4. Ce que je ne peux pas décider à ta place', 2)
 bullets(d, [
     'Ton statut juridique et ton numéro fiscal : ils dépendent de ton dossier personnel.',
     'Le taux de TVA applicable : à confirmer auprès de la DGI.',
-    'La mention exacte à utiliser en l’absence de NIF : à valider avec le centre des impôts.',
+    'La mention exacte en l’absence de NIF : à valider avec le centre des impôts.',
+    'Ce document est une aide pratique, pas un avis comptable ou fiscal.',
 ])
-d.add_paragraph('Ce document est une aide pratique, pas un avis comptable ou fiscal. Pour une somme de ce montant, un seul échange avec la DGI ou un centre de gestion agréé peut sécuriser toute la démarche.')
+contact(d)
 d.save(f'{OUT}/05-Facturation-sans-comptable.docx')
 
 # ---------------------------------------------------------------- 6
-d = base('6. Sécurisation et alertes de connexion', 'Notification à chaque connexion à l’espace administration GSMD.')
-d.add_paragraph('Une alerte est désormais envoyée lorsqu’un administrateur se connecte. Le message contient uniquement : le compte, la date, l’adresse IP et le type d’appareil. Jamais de mot de passe ni de jeton.')
+d = base('6. Sécurisation et alertes de connexion', 'Notification à chaque connexion à l’espace administration.')
+d.add_paragraph('Une alerte est envoyée lorsqu’un administrateur se connecte. Le message contient uniquement : compte, date, adresse IP et type d’appareil. Jamais de mot de passe ni de jeton.')
 d.add_heading('1. Options de notification', 2)
-table(d, ['Option', 'Coût', 'Avantages', 'Inconvénients'], [
-    ['Email via Resend', 'Gratuit dans le quota', 'Déjà configuré, fiable, historique dans la boîte mail', 'Nécessite le domaine vérifié dans Resend'],
-    ['Webhook (CallMeBot / Zapier / Make)', 'Gratuit ou selon service', 'Simple à brancher, possible WhatsApp', 'Service non officiel pour WhatsApp, fiabilité variable'],
-    ['Twilio WhatsApp', 'Payant (à l’usage)', 'API WhatsApp officielle, fiable', 'Compte Twilio + numéro, coût par message'],
-    ['Twilio appel vocal', 'Payant (à l’usage)', 'Appel immédiat en cas de connexion', 'Coût par minute, nécessite un numéro'],
-    ['Journal d’audit seul', 'Inclus', 'Aucune dépendance externe', 'Aucune alerte en temps réel'],
-], [4.4, 3.2, 6.4, 6.0])
+bullets(d, [
+    'Email via Resend — coût : gratuit dans le quota — avantages : déjà configuré, fiable, historique par email — limite : domaine à vérifier dans Resend.',
+    'Webhook (CallMeBot / Zapier / Make) — coût : gratuit ou selon service — avantages : simple, possible WhatsApp — limite : service non officiel, fiabilité variable.',
+    'Twilio WhatsApp — coût : payant à l’usage — avantages : API officielle, fiable — limite : compte et numéro à acheter.',
+    'Twilio appel vocal — coût : payant à l’usage — avantages : appel immédiat — limite : coût par minute.',
+    'Journal d’audit seul — coût : inclus — avantages : aucune dépendance — limite : pas d’alerte temps réel.',
+])
 d.add_heading('2. Ce que l’école doit décider', 2)
 bullets(d, [
-    'Qui reçoit l’alerte (email et/ou numéro WhatsApp et/ou numéro d’appel).',
+    'Qui reçoit l’alerte : email et/ou numéro WhatsApp et/ou numéro d’appel.',
     'Quel canal retenir : gratuit (email/webhook) ou payant officiel (Twilio).',
     'Si un appel est souhaité en plus du message.',
 ])
-d.add_heading('3. Ce que tu dois me transmettre (jamais dans le chat)', 2)
+d.add_heading('3. Ce à transmettre (jamais dans le chat)', 2)
 bullets(d, [
     'Email de réception : à écrire toi-même dans ADMIN_NOTIFY_EMAIL via les secrets Fly.',
     'Webhook : l’URL complète fournie par ton service (CallMeBot/Zapier/Make).',
-    'Twilio : Account SID, Auth Token, numéros From/To — à saisir dans les secrets Fly, pas dans un email.',
+    'Twilio : Account SID, Auth Token, numéros From/To — à saisir dans les secrets Fly.',
     'Commande : flyctl secrets set ADMIN_NOTIFY_EMAIL="..." -a madeleinedanielou-api',
 ])
 d.add_heading('4. Vérification après configuration', 2)
 bullets(d, [
     'Se connecter une fois à /admin/dashboard.',
     'Vérifier la réception du message ou de l’appel.',
-    'Contrôler la ligne « connexion_admin » dans la table public.audit_log (Supabase).',
+    'Contrôler la ligne « connexion_admin » dans public.audit_log (Supabase).',
     'Ne jamais transmettre le mot de passe admin par WhatsApp : utiliser un lien de réinitialisation Supabase.',
 ])
 d.add_heading('5. Sécurité déjà en place', 2)
@@ -301,71 +277,51 @@ bullets(d, [
     'Page /admin en noindex, secrets hors du dépôt, Helmet et CORS strict.',
     'Journal d’audit des consultations et exports.',
 ])
+contact(d)
 d.save(f'{OUT}/06-Securisation-et-alertes.docx')
-
 
 # ---------------------------------------------------------------- 7
 d = base('7. Protection IA et Cloudflare', 'Couches de défense supplémentaires — réglages à valider par l’école.')
 d.add_heading('1. Les quatre couches mises en place', 2)
-table(d, ['Couche', 'Rôle', 'Coût', 'Décision requise'], [
-    ['Limiteurs + JWT + RLS', 'Bloquent le spam, les accès non autorisés et les abus de requêtes', 'Inclus', 'Aucune'],
-    ['Blocage IP deterministe', '10 échecs / 15 min → IP bloquée 30 min', 'Inclus', 'Valider le seuil et la durée'],
-    ['Agent IA de surveillance', 'Analyse les logs toutes les 15 min, résume en français, alerte', 'Gratuit sans LLM ; tokens si LLM', 'Choisir LLM ou résumé deterministe'],
-    ['Cloudflare (à venir)', 'WAF, DDoS, Bot Fight avant Vercel/Fly', 'Plan gratuit', 'À installer quand le domaine est connu'],
-], [4.2, 6.6, 3.4, 4.8])
+bullets(d, [
+    'Limiteurs + JWT + RLS — bloquent le spam, les accès non autorisés et les abus de requêtes — coût inclus — aucune décision requise.',
+    'Blocage IP deterministe — 10 échecs / 15 min → IP bloquée 30 min — coût inclus — à valider : seuil et durée.',
+    'Agent IA de surveillance — analyse les échecs toutes les 15 min, résume en français, alerte — gratuit sans LLM, tokens si LLM — à choisir : LLM ou résumé deterministe.',
+    'Cloudflare (à venir) — WAF, DDoS, Bot Fight avant Vercel/Fly — plan gratuit — à installer quand le domaine est connu.',
+])
 d.add_heading('2. Ce que fait l’agent IA', 2)
 bullets(d, [
     'Lit uniquement les événements d’authentification (échecs, IP, email, date) — jamais de mot de passe.',
-    'Détecte : pics d’échecs, plusieurs IP distinctes, tentatives répétées sur le même compte.',
+    'Détecte les pics d’échecs, plusieurs IP distinctes, les tentatives répétées sur le même compte.',
     'Produit un résumé en français : « 47 échecs depuis 3 IP en 15 min, cible admin@… ».',
-    'Bloque prudemment les IP dépassant 4 échecs sur 15 min, pour 30 min, et t’envoie une alerte.',
+    'Bloque prudemment les IP dépassant 4 échecs sur 15 min, pour 30 min, et envoie une alerte.',
     'Écrit chaque action dans le journal d’audit public.audit_log.',
 ])
 d.add_heading('3. Sécurité du dispositif', 2)
 bullets(d, [
     'Aucun blocage définitif : toutes les restrictions expirent après 30 min.',
     'Les IP de confiance (TRUSTED_IPS) ne sont jamais bloquées — y mettre l’IP du secrétariat.',
-    'Déblocage immédiat possible : npm --workspace server run unblock -- <IP>.',
+    'Déblocage immédiat : npm --workspace server run unblock -- <IP>.',
     'L’agent n’a pas accès aux secrets : il ne reçoit que des statistiques anonymisées.',
-    'La machine Fly reste allumée pour que la surveillance tourne (coût indicatif : quelques USD/mois).',
+    'La machine Fly reste allumée pour que la surveillance tourne (quelques USD/mois).',
 ])
 d.add_heading('4. Ce que tu dois décider / transmettre', 2)
-table(d, ['Élément', 'Où le renseigner', 'À nous transmettre'], [
-    ['IP du secrétariat', 'Secret Fly TRUSTED_IPS', 'L’IP publique (à obtenir en allant sur « whatismyip »)'],
-    ['Canal d’alerte', 'Secrets Fly (email / webhook / Twilio)', 'Le choix du canal + les identifiants saisis par toi'],
-    ['LLM pour le résumé', 'Secret Fly AI_API_KEY', 'Optionnel : clé OpenAI-compatible. Sans clé, résumé deterministe gratuit'],
-    ['Cloudflare', 'dash.cloudflare.com + registrar', 'Accès au compte Cloudflare une fois le domaine disponible'],
-], [4.4, 6.2, 8.4])
+bullets(d, [
+    'IP du secrétariat : à mettre dans le secret Fly TRUSTED_IPS (à obtenir sur « whatismyip »).',
+    'Canal d’alerte : à choisir puis identifiants saisis par toi dans les secrets Fly.',
+    'LLM pour le résumé : secret Fly AI_API_KEY — optionnel, clé OpenAI-compatible. Sans clé, résumé gratuit.',
+    'Cloudflare : compte à créer sur dash.cloudflare.com quand le domaine sera disponible.',
+])
 d.add_heading('5. Limites à connaître', 2)
 bullets(d, [
     'Aucun système ne promet « zéro attaque » : un DDoS volumétrique est stoppé par Cloudflare, pas par l’agent.',
-    'L’agent peut se tromper : c’est pour cela que les blocages sont courts et réversibles.',
+    'L’agent peut se tromper : les blocages sont courts et réversibles.',
     'Le LLM optionnel consomme des tokens uniquement lorsqu’une anomalie est détectée.',
-    'Les limitations ne remplacent pas les sauvegardes Supabase ni les mises à jour du site.',
+    'Ces protections ne remplacent pas les sauvegardes Supabase ni les mises à jour du site.',
 ])
+contact(d)
 d.save(f'{OUT}/07-Protection-IA-et-Cloudflare.docx')
 
-
-def add_dev_contact(path):
-    d = Document(path)
-    if any('Coordonnées du développeur' in p.text for p in d.paragraphs):
-        return
-    d.add_heading('Coordonnées du développeur', 2)
-    table(d, ['Canal', 'Coordonnées'], [
-        ['Gmail', 'patrickndri120@gmail.com'],
-        ['Portfolio', 'https://patrickdev-portfolio.vercel.app'],
-        ['GitHub', 'https://github.com/PATRICK110304'],
-        ['LinkedIn', '[VOTRE URL LINKEDIN — À TRANSMETTRE]'],
-    ], [4, 15])
-    p = d.add_paragraph('Renseignements à confirmer par le développeur avant envoi.')
-    p.runs[0].italic = True
-    p.runs[0].font.size = Pt(9)
-    d.save(path)
-
-for fname in os.listdir(OUT):
-    if fname.endswith('.docx'):
-        add_dev_contact(os.path.join(OUT, fname))
-
-print('Documents créés dans', OUT)
+print('Documents créés sans tableaux dans', OUT)
 for f in sorted(os.listdir(OUT)):
     print(' -', f, os.path.getsize(os.path.join(OUT, f)), 'octets')
