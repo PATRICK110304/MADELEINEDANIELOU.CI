@@ -23,3 +23,10 @@ server/public/uploads/
 # Fly.io Sprites (configuration locale)
 .sprite
 .sprite/
+.vercel
+.env*
+
+# Liens de skills générés par `npx skills add` (agents tiers)
+.*/skills/
+skills/
+data/skills/
