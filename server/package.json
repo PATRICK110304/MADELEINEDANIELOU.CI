@@ -8,6 +8,7 @@
     "start": "node src/index.js",
     "seed": "node src/seed.js",
     "db:import": "node scripts/import.js",
+    "db:check": "node scripts/db-check.js",
     "secrets": "node scripts/generate-secrets.js"
   },
   "dependencies": {
