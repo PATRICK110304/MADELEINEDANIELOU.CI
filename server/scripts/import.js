@@ -34,11 +34,14 @@ const pool = new Pool({
 })
 
 async function main() {
-  if (!fs.existsSync(dataFile)) {
-    console.error(`✖ Fichier source introuvable : ${dataFile}`)
-    process.exit(1)
+  /* db.json est volontairement gitignoré : sur un déploiement frais
+     il n'existe pas. On applique quand même les migrations, puis on
+     laisse seed() créer le compte admin et les contenus par défaut. */
+  const hasSource = fs.existsSync(dataFile)
+  const raw = hasSource ? JSON.parse(fs.readFileSync(dataFile, 'utf8')) : null
+  if (!hasSource) {
+    console.warn(`• ${path.basename(dataFile)} absent : migrations seules, puis amorçage.`)
   }
-  const raw = JSON.parse(fs.readFileSync(dataFile, 'utf8'))
 
   const client = await pool.connect()
   try {
@@ -52,7 +55,7 @@ async function main() {
     // 2) Import dans une transaction : tout ou rien.
     await client.query('BEGIN')
     for (const [key, spec] of Object.entries(COLLECTIONS)) {
-      const items = Array.isArray(raw[key]) ? raw[key] : []
+      const items = raw && Array.isArray(raw[key]) ? raw[key] : []
       await client.query(`DELETE FROM ${spec.table}`)
       for (const item of items) {
         const values = spec.to(item)
@@ -70,6 +73,12 @@ async function main() {
   } finally {
     client.release()
     await pool.end()
+  }
+
+  if (!hasSource && !process.exitCode) {
+    const { seed } = await import('../src/seed.js')
+    await seed()
+    console.log('✔ Amorçage terminé (admin local si mode JWT, documents, podcasts).')
   }
 }
 
