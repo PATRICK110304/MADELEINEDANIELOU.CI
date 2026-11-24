@@ -30,3 +30,7 @@ server/public/uploads/
 .*/skills/
 skills/
 data/skills/
+
+# Python
+__pycache__/
+*.pyc
