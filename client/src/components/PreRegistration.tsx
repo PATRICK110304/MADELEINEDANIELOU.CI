@@ -274,6 +274,15 @@ export default function PreRegistration() {
                     )}
                   </div>
 
+                  {/* Information sur le traitement des données */}
+                  <p className="mt-6 rounded-2xl bg-navy-50 p-4 text-xs leading-relaxed text-ink/90">
+                    Les informations demandées sont nécessaires à l'instruction de la pré-inscription
+                    et limitées au minimum utile. Elles sont traitées par le secrétariat du GSMD.
+                    Vous pouvez exercer vos droits d'accès, de rectification et de suppression en
+                    écrivant à <a href={`mailto:${contact.email}`} className="font-semibold text-navy-500 underline">{contact.email}</a>.{' '}
+                    <Link to="/politique-confidentialite" onClick={(e) => e.stopPropagation()} className="font-semibold text-navy-500 underline">Politique de confidentialité</Link>.
+                  </p>
+
                   {/* Consentement */}
                   <label className="mt-6 flex cursor-pointer items-start gap-3">
                     <input type="checkbox" checked={data.consent} onChange={(e) => set('consent', e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-navy-300 accent-navy-500" />

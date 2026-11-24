@@ -22,24 +22,27 @@ export default function LegalNoticePage() {
         <section className="mt-10 rounded-3xl bg-white p-6 ring-1 ring-navy-100 sm:p-8">
           <h2 className={h2}>1. Éditeur du site</h2>
           <p className={p}>
-            Groupe Scolaire Madeleine-Daniélou Abidjan (GSMD)<br />
+            Ce site est édité par la <strong>Communauté Saint-François-Xavier</strong>, qui anime le
+            Groupe Scolaire Madeleine-Daniélou Abidjan (GSMD).<br />
             {contact.adresse}<br />
             {contact.bp}<br />
-            Téléphone : {contact.telephone} · {contact.telephoneMobile}<br />
-            Email : <a className="text-navy-500 underline" href={`mailto:${contact.email}`}>{contact.email}</a>
+            Téléphone du secrétariat : {contact.telephone} · {contact.telephoneMobile}<br />
+            Email du secrétariat : <a className="text-navy-500 underline" href={`mailto:${contact.email}`}>{contact.email}</a><br />
+            Téléphone de la Communauté : +225 27 22 44 01 86<br />
+            Email de la Communauté : <a className="text-navy-500 underline" href="mailto:sfx-abidjan@communaute-sfx.com">sfx-abidjan@communaute-sfx.com</a>
           </p>
           <p className={p}>
-            Directeur de publication : la Direction du Groupe Scolaire Madeleine-Daniélou Abidjan.
+            <strong className="font-semibold text-copper-700">À COMPLÉTER PAR L'ÉCOLE :</strong>{' '}
+            nom et qualité du directeur de publication.
           </p>
 
           <h2 className={h2}>2. Hébergement</h2>
           <div className={warn}>
             <strong className="font-semibold text-ink">Information à compléter avant la mise en ligne.</strong>
             <br />
-            Nom de l'hébergeur, adresse postale, téléphone et email de contact, ainsi que le lieu
-            d'hébergement du serveur, doivent être renseignés ici par l'établissement dès que le
-            prestataire de production est retenu (front statique et API Node/PostgreSQL).
-            Aucune information d'hébergement n'a été inventée dans cette page.
+            <strong className="font-semibold text-copper-700">À COMPLÉTER PAR L'ÉCOLE :</strong>{' '}
+            nom de l'hébergeur, adresse postale, téléphone, email de contact et lieu d'hébergement
+            du serveur. Aucune information d'hébergement n'a été inventée dans cette page.
           </div>
 
           <h2 className={h2}>3. Accès administrateur</h2>

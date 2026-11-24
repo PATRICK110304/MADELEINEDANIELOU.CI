@@ -78,11 +78,10 @@ export default function PrivacyPolicyPage() {
 
           <h2 className={h2}>5. Durée de conservation</h2>
           <p className={p}>
-            Les dossiers de pré-inscription sont conservés le temps de l'admission et de l'année
-            scolaire concernée, puis archivés selon les obligations légales et réglementaires
-            applicables aux établissements scolaires. Les messages de contact sont conservés
-            jusqu'à leur traitement, puis supprimés. Les journaux techniques sont conservés
-            brièvement à des fins de sécurité.
+            <strong className="font-semibold text-copper-700">À COMPLÉTER PAR L'ÉCOLE :</strong>{' '}
+            durée de conservation exacte des dossiers de pré-inscription, des messages de contact et
+            du journal d'accès administrateur, ainsi que les modalités d'archivage. Ces durées doivent
+            être validées par la direction avant la mise en ligne définitive.
           </p>
 
           <h2 className={h2}>6. Sécurité</h2>
@@ -98,8 +97,10 @@ export default function PrivacyPolicyPage() {
 
           <h2 className={h2}>7. Vos droits</h2>
           <p className={p}>
-            Conformément à la loi n° 2013-450 du 19 novembre 2013 relative à la protection des
-            données personnelles et aux prescriptions de l'ARTCI (Autorité de régulation des
+            <strong className="font-semibold text-copper-700">À COMPLÉTER PAR L'ÉCOLE :</strong>{' '}
+            références de la déclaration auprès de l'ARTCI et des autorités ivoiriennes compétentes.
+            Le site s'appuie sur la loi n° 2013-450 du 19 novembre 2013 relative à la protection des
+            données personnelles et sur les prescriptions de l'ARTCI (Autorité de régulation des
             télécommunications / TIC de Côte d'Ivoire), vous disposez d'un droit d'accès, de
             rectification, de suppression et d'opposition au traitement de vos données.
             Pour les exercer, adressez votre demande à <a className="text-navy-500 underline" href={`mailto:${contact.email}`}>{contact.email}</a>.
