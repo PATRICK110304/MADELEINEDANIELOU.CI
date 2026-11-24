@@ -8,19 +8,17 @@
 // orientation, width, height, featured, uploadedAt
 // ============================================================
 import { Router } from 'express'
-import fs from 'node:fs'
 import path from 'node:path'
 import crypto from 'node:crypto'
 import multer from 'multer'
 import { config } from '../config.js'
 import { getDb, updateDb } from '../db.js'
+import { saveFile, deleteFile } from '../services/storage.js'
 import { cleanString } from '../middleware/sanitize.js'
 import { requireAuth } from '../middleware/auth.js'
 import { processPhoto, suggestSection } from '../services/photos.js'
 
 const router = Router()
-const PHOTOS_DIR = path.join(config.publicDir, 'photos')
-fs.mkdirSync(PHOTOS_DIR, { recursive: true })
 
 const ALLOWED = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif', 'image/avif'])
 const upload = multer({
@@ -47,14 +45,19 @@ router.post('/', requireAuth, upload.single('file'), async (req, res) => {
   if (!req.file) return res.status(400).json({ message: 'Fichier photo requis (champ « file »).' })
   try {
     const out = await processPhoto(req.file.buffer, req.file.originalname)
-    fs.writeFileSync(path.join(PHOTOS_DIR, out.name), out.buffer)
+    const stored = await saveFile({
+      buffer: out.buffer,
+      folder: 'photos',
+      filename: out.name,
+      resourceType: 'image',
+    })
     const photo = {
       id: crypto.randomUUID(),
       section: SECTIONS.includes(req.body.section) ? req.body.section : suggestSection(req.file.originalname),
       title: cleanString(req.body.title, 200) || path.parse(req.file.originalname).name,
       description: cleanString(req.body.description, 400) || '',
-      url: `/media/photos/${out.name}`,
-      size: out.buffer.length,
+      url: stored.url,
+      size: stored.size,
       orientation: out.orientation,
       width: out.width,
       height: out.height,
@@ -95,8 +98,7 @@ router.delete('/:id', requireAuth, async (req, res) => {
     return photo
   })
   if (!removed) return res.status(404).json({ message: 'Photo introuvable.' })
-  const filePath = path.join(PHOTOS_DIR, path.basename(removed.url))
-  if (fs.existsSync(filePath)) fs.unlinkSync(filePath)
+  await deleteFile(removed.url)
   res.json({ message: 'Photo supprimée.' })
 })
 

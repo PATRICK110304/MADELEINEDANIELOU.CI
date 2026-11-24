@@ -1,0 +1,17 @@
+# Secrets — ne jamais versionner
+.env
+.env.*
+!.env.example
+
+# Données générées / uploads locaux
+data/db.json
+public/uploads/
+public/documents/*.pdf
+public/audios/*.mp3
+public/audios/*.wav
+public/audios/*.m4a
+public/audios/*.ogg
+public/photos/*.webp
+
+# Dépendances
+node_modules/

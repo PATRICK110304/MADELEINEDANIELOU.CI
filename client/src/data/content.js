@@ -213,6 +213,8 @@ export const pagesUtiles = [
   { label: 'Vidéo', href: '/ceremonie#video' },
   { label: 'Web Radio', href: '/radio' },
   { label: 'Partenaires', href: '/partenaires' },
+  { label: 'Politique de confidentialité', href: '/politique-confidentialite' },
+  { label: 'Mentions légales', href: '/mentions-legales' },
 ]
 
 /* ---------- Navigation : SITE MULTI-PAGES (routes internes) ---------- */

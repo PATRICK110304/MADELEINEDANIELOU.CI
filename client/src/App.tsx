@@ -33,6 +33,9 @@ import PartenairesPage from './pages/PartenairesPage'
 import ContactPage from './pages/ContactPage'
 import AdminDashboardPage from './pages/AdminDashboardPage'
 import PhotosPage from './pages/PhotosPage'
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
+import LegalNoticePage from './pages/LegalNoticePage'
+import CookieBanner from './components/CookieBanner'
 
 /* Défilement : haut de page à chaque navigation,
    ou ancre (#section) quand le lien en comporte une */
@@ -82,6 +85,8 @@ export default function App() {
           <Route path="/radio" element={<RadioPage />} />
           <Route path="/partenaires" element={<PartenairesPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/politique-confidentialite" element={<PrivacyPolicyPage />} />
+          <Route path="/mentions-legales" element={<LegalNoticePage />} />
           <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
           {/* Page inconnue → accueil */}
           <Route path="*" element={<HomePage />} />
@@ -90,6 +95,7 @@ export default function App() {
 
       {/* Pied de page — coordonnées, pages utiles, réseaux (#contact) */}
       {!isAdmin && <Footer />}
+      {!isAdmin && <CookieBanner />}
     </div>
   )
 }

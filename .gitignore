@@ -19,3 +19,7 @@ server/public/uploads/
 # Fichiers temporaires de téléchargement / navrateur
 *.crdownload
 .xdp-*
+
+# Fly.io Sprites (configuration locale)
+.sprite
+.sprite/

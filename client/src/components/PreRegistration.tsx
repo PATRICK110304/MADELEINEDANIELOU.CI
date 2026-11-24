@@ -278,7 +278,15 @@ export default function PreRegistration() {
                   <label className="mt-6 flex cursor-pointer items-start gap-3">
                     <input type="checkbox" checked={data.consent} onChange={(e) => set('consent', e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-navy-300 accent-navy-500" />
                     <span className="text-sm text-ink/95">
-                      Je certifie l'exactitude des informations et accepte d'être contacté(e) par le secrétariat.{' '}
+                      Je certifie l'exactitude des informations et accepte d'être contacté(e) par le secrétariat
+                      conformément à la{' '}
+                      <Link
+                        to="/politique-confidentialite"
+                        onClick={(e) => e.stopPropagation()}
+                        className="font-semibold text-navy-500 underline underline-offset-2 focus-visible:ring-2 focus-visible:ring-navy-300"
+                      >
+                        politique de confidentialité
+                      </Link>.{' '}
                       <span className="text-navy-500">*</span>
                     </span>
                   </label>

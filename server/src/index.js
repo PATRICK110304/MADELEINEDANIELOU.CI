@@ -22,10 +22,6 @@ import documentsRoutes from './routes/documents.js'
 import podcastsRoutes from './routes/podcasts.js'
 import photosRoutes from './routes/photos.js'
 
-/* Amorçage de la base (crée admin + contenus par défaut si vide) */
-loadDb()
-seed()
-
 const app = express()
 app.set('trust proxy', 1) // nécessaire derrière Vercel/Netlify/Nginx
 
@@ -83,10 +79,22 @@ app.get('/api/health', (_req, res) => res.json({ status: 'ok', service: 'mdc-api
 app.use(notFound)
 app.use(errorHandler)
 
-/* ---------- Démarrage ---------- */
-fs.mkdirSync(config.dataDir, { recursive: true })
-app.listen(config.port, () => {
-  console.log(`✔ API MDC : http://localhost:${config.port}`)
-  console.log(`  • Documents : ${config.documentsDir}`)
-  console.log(`  • Audios    : ${config.audiosDir}`)
+/* ---------- Démarrage ----------
+   On attend la base AVANT d'ouvrir le port : aucun appel ne peut
+   tomber sur un cache vide pendant le chargement initial.         */
+async function start() {
+  await loadDb()
+  await seed()
+  fs.mkdirSync(config.dataDir, { recursive: true })
+  app.listen(config.port, () => {
+    console.log(`✔ API MDC : http://localhost:${config.port}`)
+    console.log(`  • Documents : ${config.documentsDir}`)
+    console.log(`  • Audios    : ${config.audiosDir}`)
+    console.log(`  • Base      : PostgreSQL (${process.env.CLOUDINARY_URL ? 'Cloudinary' : 'stockage local'})`)
+  })
+}
+
+start().catch((err) => {
+  console.error('✖ Démarrage impossible :', err.message)
+  process.exit(1)
 })

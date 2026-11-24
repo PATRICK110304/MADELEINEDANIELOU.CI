@@ -8,7 +8,7 @@
 import { Router } from 'express'
 import crypto from 'node:crypto'
 import rateLimit from 'express-rate-limit'
-import { loadDb, updateDb } from '../db.js'
+import { getDb, saveDb, updateDb } from '../db.js'
 import { requireAuth } from '../middleware/auth.js'
 import { sendContactEmail } from '../services/email.js'
 
@@ -59,8 +59,8 @@ router.post('/', contactLimiter, async (req, res) => {
 })
 
 /* ---------- Admin : liste des messages (JWT) ---------- */
-router.get('/admin', requireAuth, (req, res) => {
-  const db = loadDb()
+router.get('/admin', requireAuth, (_req, res) => {
+  const db = getDb()
   res.json({ messages: Array.isArray(db.contactMessages) ? db.contactMessages : [] })
 })
 
@@ -81,9 +81,9 @@ router.patch('/:id/traite', requireAuth, async (req, res) => {
 
 /* ---------- Admin : suppression d'un message (JWT) ---------- */
 router.delete('/:id', requireAuth, (req, res) => {
-  const db = loadDb()
+  const db = getDb()
   const idx = db.contactMessages?.findIndex((m) => m.id === req.params.id)
-  if (idx < 0) return res.status(404).json({ message: 'Message introuvable' })
+  if (idx < 0 || idx === undefined) return res.status(404).json({ message: 'Message introuvable' })
   db.contactMessages.splice(idx, 1)
   saveDb()
   res.json({ message: 'Supprimé.' })

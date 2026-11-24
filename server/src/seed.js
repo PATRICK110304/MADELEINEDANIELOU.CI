@@ -26,7 +26,7 @@ const podcastsSeed = [
   { title: 'Vie scolaire & clubs', description: 'Robotique, théâtre, débat : les élèves racontent leurs clubs.', duration: '7:45', url: '/audios/episode-04-vie-scolaire-et-clubs.wav' },
 ]
 
-export function seed() {
+export async function seed() {
   const db = getDb()
 
   /* Compte administrateur (uniquement s'il n'existe pas) */
@@ -62,12 +62,14 @@ export function seed() {
     console.log(`✔ ${db.podcasts.length} épisodes radio seedés`)
   }
 
-  saveDb()
+  await saveDb()
 }
 
 /* Exécution directe : npm --workspace server run seed */
 const isDirectRun = process.argv[1]?.includes('seed')
 if (isDirectRun) {
-  seed()
+  const { loadDb } = await import('./db.js')
+  await loadDb()
+  await seed()
   console.log('✔ Amorçage terminé.')
 }

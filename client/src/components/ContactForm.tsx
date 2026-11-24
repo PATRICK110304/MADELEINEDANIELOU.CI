@@ -72,7 +72,7 @@ export default function ContactForm() {
             {errors.message && <p id="e-message" role="alert" className="mt-1 text-sm text-error">{errors.message}</p>}</div>
           <div className="flex items-start gap-3">
             <input id="c-consent" name="consent" type="checkbox" checked={form.consent} onChange={(e) => set('consent', e.target.checked)} className="mt-1 h-5 w-5 rounded border-navy-200 accent-navy-500" aria-invalid={!!errors.consent} aria-describedby={errors.consent ? 'e-consent' : undefined} />
-            <label htmlFor="c-consent" className="text-sm text-ink/90">J'accepte que mes données soient utilisées pour traiter ma demande. <a href="/confidentialite" className="text-navy-500 underline">Politique de confidentialité</a></label>
+            <label htmlFor="c-consent" className="text-sm text-ink/90">J'accepte que mes données soient utilisées pour traiter ma demande. <a href="/politique-confidentialite" className="text-navy-500 underline">Politique de confidentialité</a></label>
           </div>
           {errors.consent && <p id="e-consent" role="alert" className="text-sm text-error">{errors.consent}</p>}
           <button type="submit" className="inline-flex min-h-[48px] items-center rounded-full bg-navy-500 px-8 font-semibold text-white transition-colors hover:bg-navy-600">Envoyer</button>
