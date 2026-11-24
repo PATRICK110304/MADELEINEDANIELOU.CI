@@ -1,0 +1,21 @@
+# Dépendances & builds
+node_modules/
+dist/
+build/
+
+# Données & uploads générés à l'exécution (API)
+server/data/db.json
+server/public/uploads/
+
+# Environnement
+.env
+.env.local
+.env.*.local
+
+# Éditeurs / OS
+.DS_Store
+*.log
+
+# Fichiers temporaires de téléchargement / navrateur
+*.crdownload
+.xdp-*

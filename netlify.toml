@@ -1,0 +1,23 @@
+# ============================================================
+# Configuration Netlify — client statique (SPA)
+# Déploiement : `netlify deploy --prod` ou via l'interface web
+# (répertoire de publication : client/dist)
+# ============================================================
+[build]
+  base    = "client/"
+  command = "npm run build"
+  publish = "client/dist"
+
+# Redirection SPA : toute route inconnue renvoie vers index.html
+[[redirects]]
+  from     = "/*"
+  to       = "/index.html"
+  status   = 200
+
+# En-têtes de sécurité côté client
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options        = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy        = "strict-origin-when-cross-origin"

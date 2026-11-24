@@ -1,0 +1,19 @@
+{
+  "name": "madeleinedanielou",
+  "private": true,
+  "version": "2.0.0",
+  "description": "Site officiel du Collège Madeleine Daniélou — client React + API Express",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "install:all": "npm install",
+    "placeholders": "node tools/generate-placeholders.mjs",
+    "dev:client": "npm --workspace client run dev",
+    "dev:server": "npm --workspace server run dev",
+    "build:client": "npm --workspace client run build",
+    "start:server": "npm --workspace server run start",
+    "seed": "npm --workspace server run seed"
+  }
+}
