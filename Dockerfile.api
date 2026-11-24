@@ -1,0 +1,19 @@
+# ============================================================
+# Image de l'API Express (monorepo npm workspaces)
+# Build depuis la racine : docker build -f Dockerfile.api .
+# ============================================================
+FROM node:22-slim AS deps
+WORKDIR /app
+COPY package.json package-lock.json ./
+COPY client/package.json ./client/package.json
+COPY server/package.json ./server/package.json
+RUN npm ci --omit=dev --workspace server
+
+FROM node:22-slim
+WORKDIR /app
+ENV NODE_ENV=production PORT=4000
+COPY --from=deps /app/node_modules ./node_modules
+COPY package.json ./
+COPY server ./server
+EXPOSE 4000
+CMD ["node", "server/src/index.js"]

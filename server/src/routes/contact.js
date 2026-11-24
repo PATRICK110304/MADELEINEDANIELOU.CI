@@ -53,9 +53,17 @@ router.post('/', contactLimiter, async (req, res) => {
   }
   // Une SEULE écriture, incluant acceptedConsent
   await updateDb((db) => { db.contactMessages.unshift(form) })
-  const out = await sendContactEmail(form)
 
-  res.json({ success: true, message: 'Demande envoyée. Vous recevrez une réponse par email.', ...out })
+  /* L'enregistrement est déjà fait : un incident email ne doit pas
+     renvoyer une erreur au visiteur (le secrétariat relit la base). */
+  let out
+  try {
+    out = await sendContactEmail(form)
+  } catch (err) {
+    out = { emailSent: false, emailReason: `Email non envoyé : ${err.message}` }
+  }
+
+  res.json({ success: true, message: 'Demande enregistrée. Vous recevrez une réponse par email.', ...out })
 })
 
 /* ---------- Admin : liste des messages (JWT) ---------- */
