@@ -19,7 +19,7 @@ import { COLLECTIONS } from '../src/db.js'
 const { Pool } = pg
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const dataFile = path.join(__dirname, '..', 'data', 'db.json')
-const migrationFile = path.join(__dirname, '..', 'migrations', '001_init.sql')
+const migrationsDir = path.join(__dirname, '..', 'migrations')
 
 if (!process.env.DATABASE_URL) {
   console.error('✖ DATABASE_URL manquante — renseignez-la dans server/.env')
@@ -42,11 +42,11 @@ async function main() {
 
   const client = await pool.connect()
   try {
-    // 1) Schéma : créé une seule fois si la table users n'existe pas.
-    const { rows } = await client.query("SELECT to_regclass('public.users') AS exists")
-    if (!rows[0].exists) {
-      console.log('• Création du schéma (001_init.sql)…')
-      await client.query(fs.readFileSync(migrationFile, 'utf8'))
+    // 1) Schéma : toutes les migrations, dans l'ordre (idempotentes).
+    const migrations = fs.readdirSync(migrationsDir).filter((f) => f.endsWith('.sql')).sort()
+    for (const file of migrations) {
+      console.log(`• Migration ${file}…`)
+      await client.query(fs.readFileSync(path.join(migrationsDir, file), 'utf8'))
     }
 
     // 2) Import dans une transaction : tout ou rien.

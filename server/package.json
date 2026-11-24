@@ -12,6 +12,7 @@
     "secrets": "node scripts/generate-secrets.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "2.119.2",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.5.1",
     "cors": "^2.8.5",

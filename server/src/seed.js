@@ -10,6 +10,7 @@ import crypto from 'node:crypto'
 import bcrypt from 'bcryptjs'
 import { config } from './config.js'
 import { getDb, saveDb } from './db.js'
+import { supabaseAuthEnabled } from './services/supabase.js'
 
 const documentsSeed = [
   { section: 'college', title: 'Fiche de pré-inscription — Collège (6ème → 3ème)', url: '/documents/fiche-preinscription-college.pdf' },
@@ -29,8 +30,10 @@ const podcastsSeed = [
 export async function seed() {
   const db = getDb()
 
-  /* Compte administrateur (uniquement s'il n'existe pas) */
-  if (!db.users.length) {
+  /* Compte administrateur local : uniquement en mode JWT repli.
+     Avec Supabase Auth, l'admin vit dans auth.users (à créer dans
+     le dashboard Supabase avec la même adresse que ADMIN_EMAIL). */
+  if (!supabaseAuthEnabled && !db.users.length) {
     db.users.push({
       id: crypto.randomUUID(),
       email: config.admin.email.toLowerCase(),

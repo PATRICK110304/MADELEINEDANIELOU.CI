@@ -17,7 +17,14 @@ export const config = {
     .split(',')
     .map((o) => o.trim()),
 
-  /* JWT */
+  /* Supabase Auth (optionnel) — uniquement la clé PUBLISHABLE côté API.
+     La clé secrète / service_role ne doit jamais apparaître ici. */
+  supabase: {
+    url: process.env.SUPABASE_URL || '',
+    publishableKey: process.env.SUPABASE_PUBLISHABLE_KEY || '',
+  },
+
+  /* JWT (mode repli si Supabase Auth n'est pas configuré) */
   jwtSecret: process.env.JWT_SECRET || 'dev-secret-a-remplacer-en-production',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '1d',
 

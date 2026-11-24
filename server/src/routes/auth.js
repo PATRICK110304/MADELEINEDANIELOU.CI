@@ -11,6 +11,7 @@ import { config } from '../config.js'
 import { getDb } from '../db.js'
 import { cleanString } from '../middleware/sanitize.js'
 import { requireAuth } from '../middleware/auth.js'
+import { supabaseAuthEnabled } from '../services/supabase.js'
 
 const router = Router()
 
@@ -32,6 +33,15 @@ router.use((_req, res, next) => {
 
 /* ---------- Connexion ---------- */
 router.post('/login', loginLimiter, async (req, res) => {
+  /* En mode Supabase Auth, l'authentification se fait côté client
+     avec supabase.auth.signInWithPassword() : le mot de passe ne
+     transite jamais par notre API et le token est rafraîchi par le SDK. */
+  if (supabaseAuthEnabled) {
+    return res.status(400).json({
+      message: 'Connectez-vous via Supabase Auth (supabase.auth.signInWithPassword).',
+    })
+  }
+
   const email = cleanString(req.body?.email, 200).toLowerCase()
   const password = String(req.body?.password || '')
 

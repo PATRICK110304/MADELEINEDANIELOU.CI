@@ -87,11 +87,13 @@ export default function PrivacyPolicyPage() {
 
           <h2 className={h2}>6. Sécurité</h2>
           <p className={p}>
-            Les échanges sont chiffrés en HTTPS. Les accès administrateurs sont protégés par un
-            jeton JWT et les mots de passe sont hachés avec bcrypt (facteur de coût 12). Les données
-            sont stockées dans PostgreSQL et les fichiers uploadés sont traités puis enregistrés
-            sur un stockage contrôlé. L'accès à l'espace d'administration est réservé aux comptes
-            autorisés.
+            Les échanges sont chiffrés en HTTPS. Les accès administrateurs sont authentifiés par
+            Supabase Auth : le jeton d'accès est vérifié auprès du serveur d'authentification à
+            chaque requête, et seul le compte administrateur désigné par l'établissement est
+            autorisé. En mode sans Supabase, un jeton JWT local signé est utilisé et les mots de
+            passe sont hachés avec bcrypt (facteur de coût 12). Les données sont stockées dans
+            PostgreSQL et les fichiers uploadés sont traités puis enregistrés sur un stockage
+            contrôlé.
           </p>
 
           <h2 className={h2}>7. Vos droits</h2>
