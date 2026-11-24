@@ -12,7 +12,9 @@
 // sont journalisés en WARN et avalés. Aucun mot de passe ni token
 // n'est transmis dans les notifications.
 // ============================================================
+import crypto from 'node:crypto'
 import { Resend } from 'resend'
+import { pool } from '../db.js'
 
 const emailEnabled = Boolean(process.env.RESEND_API_KEY && process.env.ADMIN_NOTIFY_EMAIL)
 const webhookUrl = process.env.NOTIFY_WEBHOOK_URL || ''
@@ -23,6 +25,27 @@ const twilio = {
   whatsappTo: process.env.TWILIO_WHATSAPP_TO || '',
   callFrom: process.env.TWILIO_CALL_FROM || '',
   callTo: process.env.TWILIO_CALL_TO || '',
+}
+
+
+const PUBLIC_API = process.env.PUBLIC_API_URL || 'https://madeleinedanielou-api.fly.dev'
+
+/** Crée une alerte interactive et retourne les deux liens d'action. */
+export async function createSecurityAlert(ip, reason = '', email = null) {
+  const token = crypto.randomBytes(24).toString('hex')
+  await pool.query(
+    `INSERT INTO public.security_alerts (token, ip, email, reason)
+     VALUES ($1,$2,$3,$4)`,
+    [token, ip || 'inconnue', email, reason || 'activité suspecte'],
+  )
+  return {
+    block: `${PUBLIC_API}/api/security/alert/${token}/block`,
+    allow: `${PUBLIC_API}/api/security/alert/${token}/allow`,
+  }
+}
+
+export function actionLinks(links) {
+  return `\n\nBloquer cette connexion : ${links.block}\nCe n'est pas une attaque : ${links.allow}`
 }
 
 export const notifyChannels = [

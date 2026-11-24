@@ -12,7 +12,7 @@
 // Aucun mot de passe ni token n'est envoyé au modèle.
 // ============================================================
 import { pool } from '../db.js'
-import { notifyAdmin } from './notify.js'
+import { notifyAdmin, createSecurityAlert, actionLinks } from './notify.js'
 import { blockIp, isTrusted } from './security.js'
 import { logAudit } from './audit.js'
 
@@ -80,7 +80,13 @@ export async function runSentinel() {
     }
 
     const summary = await summarize(data)
-    await notifyAdmin('Alerte sécurité GSMD', `${summary}\n\nIP bloquées : ${blocked.join(', ') || 'aucune'}`)
+    if (!blocked.length) {
+      const links = await createSecurityAlert(
+        data.top[0]?.ip || 'inconnue',
+        `${data.failures} échecs de connexion en 15 min`,
+      )
+      await notifyAdmin('Activité suspecte détectée', `${summary}${actionLinks(links)}`)
+    }
     await logAudit('sentinel', null, `${data.failures} échecs / ${data.ips} IP — bloquées: ${blocked.length}`)
     return { scanned: true, anomalous: true, failures: data.failures, blocked }
   } catch (err) {

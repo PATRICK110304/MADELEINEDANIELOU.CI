@@ -8,7 +8,7 @@
 //  - le blocage est toujours notifié etJournalisé
 // ============================================================
 import { pool } from '../db.js'
-import { notifyAdmin } from './notify.js'
+import { notifyAdmin, createSecurityAlert, actionLinks } from './notify.js'
 
 const WINDOW_MS = 15 * 60 * 1000
 const FAILURE_LIMIT = 10
@@ -72,7 +72,11 @@ export async function blockIp(ip, reason, durationMs = BLOCK_MS) {
        VALUES ($1,$2, now() + ($3::int * interval '1 millisecond'), true)`,
       [ip, reason || 'blocage automatique', durationMs],
     )
-    await notifyAdmin('IP bloquée automatiquement', `Adresse IP : ${ip}\nMotif : ${reason}\nDurée : ${Math.round(durationMs / 60000)} min`)
+    const links = await createSecurityAlert(ip, reason)
+    await notifyAdmin(
+      'Connexion suspecte détectée',
+      `Une connexion suspecte vient d'être bloquée automatiquement.\nAdresse IP : ${ip}\nMotif : ${reason}\nDurée du blocage : ${Math.round(durationMs / 60000)} min.${actionLinks(links)}`,
+    )
     return true
   } catch (err) {
     console.warn('⚠ Blocage impossible :', err.message)

@@ -48,13 +48,11 @@ def bullets(d, items):
 
 
 def contact(d):
-    d.add_heading('Coordonnées du développeur', 2)
+    d.add_heading('Contact', 2)
     bullets(d, [
         'Gmail : patrickndri120@gmail.com',
         'Portfolio : https://patrickdev-portfolio.vercel.app',
         'GitHub : https://github.com/PATRICK110304',
-        'LinkedIn : [VOTRE URL LINKEDIN — À TRANSMETTRE]',
-        'Renseignements à confirmer avant envoi.',
     ])
 
 
@@ -281,46 +279,45 @@ contact(d)
 d.save(f'{OUT}/06-Securisation-et-alertes.docx')
 
 # ---------------------------------------------------------------- 7
-d = base('7. Protection IA et Cloudflare', 'Couches de défense supplémentaires — réglages à valider par l’école.')
-d.add_heading('1. Les quatre couches mises en place', 2)
+d = base('Protection', 'Comment le site se protège, comment l’école est prévenue et comment elle réagit.')
+d.add_paragraph('Ce document est écrit pour le secrétariat et la direction. Il explique avec des mots simples ce qui se passe, sans jargon technique.')
+d.add_heading('1. Comment le site se protège', 2)
 bullets(d, [
-    'Limiteurs + JWT + RLS — bloquent le spam, les accès non autorisés et les abus de requêtes — coût inclus — aucune décision requise.',
-    'Blocage IP deterministe — 10 échecs / 15 min → IP bloquée 30 min — coût inclus — à valider : seuil et durée.',
-    'Agent IA de surveillance — analyse les échecs toutes les 15 min, résume en français, alerte — gratuit sans LLM, tokens si LLM — à choisir : LLM ou résumé deterministe.',
-    'Cloudflare (à venir) — WAF, DDoS, Bot Fight avant Vercel/Fly — plan gratuit — à installer quand le domaine est connu.',
+    'Le site demande une preuve d’identité (un mot de passe vérifié par Supabase) avant d’ouvrir l’espace de gestion. Cette preuve est vérifiée à chaque page, pas seulement à la connexion.',
+    'Le site limite le nombre de tentatives. Après plusieurs erreurs, il refuse temporairement les demandes : une personne ne peut pas deviner un mot de passe en essayant des milliers de fois.',
+    'Les données des élèves sont rangées dans une base privée que personne ne peut lire directement depuis Internet. Seul le site peut y accéder.',
+    'Si une adresse se connecte sans arrêt et échoue plusieurs fois, elle est mise à l’écart pendant 30 minutes. Cette mesure est automatique et temporaire.',
+    'Un service de surveillance regarde régulièrement ces tentatives. Il ne lit jamais les mots de passe, seulement le nombre d’essais et l’adresse utilisée.',
 ])
-d.add_heading('2. Ce que fait l’agent IA', 2)
+d.add_heading('2. Comment l’école est prévenue', 2)
 bullets(d, [
-    'Lit uniquement les événements d’authentification (échecs, IP, email, date) — jamais de mot de passe.',
-    'Détecte les pics d’échecs, plusieurs IP distinctes, les tentatives répétées sur le même compte.',
-    'Produit un résumé en français : « 47 échecs depuis 3 IP en 15 min, cible admin@… ».',
-    'Bloque prudemment les IP dépassant 4 échecs sur 15 min, pour 30 min, et envoie une alerte.',
-    'Écrit chaque action dans le journal d’audit public.audit_log.',
+    'Dès qu’une connexion réussit, un message est envoyé au responsable : adresse email utilisée, heure, adresse technique de l’appareil et lieu approximatif.',
+    'En cas de tentative suspecte, un deuxième message est envoyé. Il indique simplement : « Une connexion suspecte vient d’être bloquée », l’adresse concernée et la raison.',
+    'Le message peut arriver par email, sur WhatsApp ou par appel selon le choix de l’école. Le réglage se fait une seule fois avec le développeur.',
+    'Le message contient deux boutons : « Bloquer cette connexion » et « Ce n’est pas une attaque ».',
 ])
-d.add_heading('3. Sécurité du dispositif', 2)
+d.add_heading('3. Comment réagir en une seconde', 2)
 bullets(d, [
-    'Aucun blocage définitif : toutes les restrictions expirent après 30 min.',
-    'Les IP de confiance (TRUSTED_IPS) ne sont jamais bloquées — y mettre l’IP du secrétariat.',
-    'Déblocage immédiat : npm --workspace server run unblock -- <IP>.',
-    'L’agent n’a pas accès aux secrets : il ne reçoit que des statistiques anonymisées.',
-    'La machine Fly reste allumée pour que la surveillance tourne (quelques USD/mois).',
+    'Si vous reconnaissez la personne : appuyez sur « Ce n’est pas une attaque ». Le blocage est annulé immédiatement et l’alerte est classée.',
+    'Si vous ne reconnaissez pas : appuyez sur « Bloquer cette connexion ». L’accès est bloqué pour une heure supplémentaire et l’alerte est classée.',
+    'Aucun mot de passe n’est à saisir : le lien reçu sur le téléphone suffit. Il ne fonctionne qu’une fois et expire après usage.',
+    'Après un blocage, le secrétariat continue à utiliser le site normalement : seule l’adresse suspecte est concernée.',
+    'Si une personne légitime est bloquée par erreur, le développeur peut la débloquer en quelques secondes.',
 ])
-d.add_heading('4. Ce que tu dois décider / transmettre', 2)
+d.add_heading('4. Ce que l’école doit décider', 2)
 bullets(d, [
-    'IP du secrétariat : à mettre dans le secret Fly TRUSTED_IPS (à obtenir sur « whatismyip »).',
-    'Canal d’alerte : à choisir puis identifiants saisis par toi dans les secrets Fly.',
-    'LLM pour le résumé : secret Fly AI_API_KEY — optionnel, clé OpenAI-compatible. Sans clé, résumé gratuit.',
-    'Cloudflare : compte à créer sur dash.cloudflare.com quand le domaine sera disponible.',
+    'Choisir le moyen d’alerte : email (gratuit), message WhatsApp (service payant officiel) ou appel téléphonique (payant).',
+    'Désigner la personne qui reçoit ces messages : direction ou secrétariat.',
+    'Confirmer l’adresse email de réception et le numéro de téléphone si un message ou un appel est souhaité.',
 ])
-d.add_heading('5. Limites à connaître', 2)
+d.add_heading('5. Ce que l’école doit savoir', 2)
 bullets(d, [
-    'Aucun système ne promet « zéro attaque » : un DDoS volumétrique est stoppé par Cloudflare, pas par l’agent.',
-    'L’agent peut se tromper : les blocages sont courts et réversibles.',
-    'Le LLM optionnel consomme des tokens uniquement lorsqu’une anomalie est détectée.',
-    'Ces protections ne remplacent pas les sauvegardes Supabase ni les mises à jour du site.',
+    'Aucun système ne peut promettre de bloquer toutes les attaques dans le monde. Celui-ci couvre les cas courants et prévient rapidement.',
+    'Les blocages sont toujours temporaires : ils ne ferment jamais le site à tout le monde.',
+    'Les mesures ne remplacent pas les bonnes habitudes : mots de passe uniques, changement régulier et vigilance sur les emails reçus.',
 ])
 contact(d)
-d.save(f'{OUT}/07-Protection-IA-et-Cloudflare.docx')
+d.save(f'{OUT}/07-Protection.docx')
 
 print('Documents créés sans tableaux dans', OUT)
 for f in sorted(os.listdir(OUT)):
