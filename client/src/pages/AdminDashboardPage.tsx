@@ -36,6 +36,30 @@ type TabId = typeof TABS[number]['id']
 
 const authHeaders = (token: string) => ({ Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' })
 const fmt = (d: string) => d ? new Date(d).toLocaleDateString('fr-FR') : '—'
+/* Dates relatives pour l'activité récente (libellé humain, pas technique). */
+const relativeDate = (d: string) => {
+  if (!d) return '—'
+  const days = Math.floor((Date.now() - new Date(d).getTime()) / 86400000)
+  if (days <= 0) return "Aujourd'hui"
+  if (days === 1) return 'Hier'
+  if (days < 7) return `Il y a ${days} jours`
+  return fmt(d)
+}
+/* Traduction des erreurs Supabase Auth. */
+const levelOf = (classe: string) => {
+  const c = classe.toLowerCase()
+  if (/maternelle|tps|\bps\b|\bms\b|\bgs\b/.test(c)) return 'Maternelle'
+  if (/cp|ce1|ce2|cm1|cm2|primaire/.test(c)) return 'Primaire'
+  if (/6[eè]|5[eè]|4[eè]|3[eè]|coll[eè]ge/.test(c)) return 'Collège'
+  if (/2nde|1[eè]re|1re|tle|terminale|lyc[eè]e/.test(c)) return 'Lycée'
+  return 'Autre'
+}
+
+const authError = (message: string) => /invalid login credentials/i.test(message)
+  ? 'Adresse email ou mot de passe incorrect.'
+  : /email not confirmed/i.test(message)
+    ? 'Confirmez votre adresse email depuis Supabase.'
+    : message
 
 export default function AdminDashboardPage() {
   const [token, setToken] = useState<string | null>(null)
@@ -62,6 +86,8 @@ export default function AdminDashboardPage() {
     try {
       const me = await fetch(`${API_BASE}/api/auth/me`, { headers: h })
       if (!me.ok) throw new Error('Session invalide')
+      const meData = await me.json().catch(() => ({}))
+      if (meData.email) setEmail(meData.email)
       const [i, m, d, p, ph] = await Promise.all([
         fetch(`${API_BASE}/api/inscriptions/admin`, { headers: h }).then((r) => r.json()),
         fetch(`${API_BASE}/api/contact/admin`, { headers: h }).then((r) => r.json()),
@@ -84,7 +110,7 @@ export default function AdminDashboardPage() {
     try {
       const t = await loginAdmin(email, password)
       setToken(t)
-    } catch (err) { setLoginError(err instanceof Error ? err.message : 'Erreur') }
+    } catch (err) { setLoginError(authError(err instanceof Error ? err.message : 'Erreur')) }
   }
 
   async function api(path: string, method: string, body?: unknown, isForm = false) {
@@ -136,64 +162,170 @@ export default function AdminDashboardPage() {
     </div>
   )
 
+  const counts: Record<TabId, number> = {
+    overview: 0,
+    inscriptions: data.inscriptions.filter((i) => i.status === 'nouveau' || i.status === 'en_attente').length,
+    documents: data.documents.length,
+    podcasts: data.podcasts.length,
+    photos: data.photos.length,
+    messages: data.messages.filter((m) => !m.traite).length,
+  }
+
   const nav = (
-    <nav aria-label="Navigation administration" className="flex flex-wrap gap-2 lg:flex-col">
-      {TABS.map((t) => <button key={t.id} onClick={() => { setTab(t.id); setMenuOpen(false) }} aria-current={tab === t.id ? 'page' : undefined} className={`min-h-[44px] rounded-xl px-4 text-left text-sm font-semibold transition-colors ${tab === t.id ? 'bg-navy-500 text-white' : 'text-ink hover:bg-navy-50'}`}>{t.label}</button>)}
-      <button onClick={() => { void logoutAdmin().then(() => setToken(null)) }} className="min-h-[44px] rounded-xl px-4 text-left text-sm font-semibold text-ink hover:bg-navy-50">Déconnexion</button>
+    <nav aria-label="Navigation administration" className="flex flex-col gap-1">
+      {TABS.map((tabItem) => (
+        <button
+          key={tabItem.id}
+          type="button"
+          onClick={() => { setTab(tabItem.id); setMenuOpen(false) }}
+          aria-pressed={tab === tabItem.id}
+          className={`flex min-h-[44px] items-center justify-between gap-2 rounded-xl px-4 text-left text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-navy-500 ${
+            tab === tabItem.id ? 'bg-navy-500 text-white' : 'text-ink hover:bg-navy-50'
+          }`}
+        >
+          <span>{tabItem.label}</span>
+          {counts[tabItem.id] > 0 && (
+            <span className={`min-w-6 rounded-full px-2 py-0.5 text-center text-xs font-bold tabular-nums ${
+              tab === tabItem.id ? 'bg-white text-navy-500' : 'bg-copper-500 text-white'
+            }`}>
+              {counts[tabItem.id]}
+            </span>
+          )}
+        </button>
+      ))}
     </nav>
   )
 
   return (
     <div className="min-h-screen bg-mist">
       <div className="mx-auto flex max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:px-8">
-        <aside className="hidden w-56 shrink-0 lg:block"><div className="sticky top-4 rounded-3xl bg-white p-4 ring-1 ring-navy-100">{nav}</div></aside>
-        <main className="min-w-0 flex-1">
-          <div className="flex items-center justify-between gap-4">
-            <div><h1 className="font-display text-3xl font-semibold text-ink">Tableau de bord</h1><p className="text-sm text-ink/90">Groupe Scolaire Madeleine-Daniélou — Abidjan</p></div>
-            <button onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-controls="admin-menu" className="min-h-[44px] rounded-xl border border-navy-100 bg-white px-4 lg:hidden"><Icon name="menu" className="h-5 w-5" /></button>
+        <aside className="hidden w-64 shrink-0 lg:block">
+          <div className="sticky top-6 rounded-3xl bg-white p-5 ring-1 ring-navy-100">
+            <div className="flex items-center gap-3">
+              <img src="/images/logo.png" alt="" className="h-11 w-11" />
+              <div>
+                <p className="font-display text-base font-semibold text-ink">Daniélou Abidjan</p>
+                <p className="text-xs font-semibold tracking-wider text-navy-500 uppercase">Administration</p>
+              </div>
+            </div>
+            <p className="mt-4 truncate text-xs text-ink/90" title={email}>Connecté : {email || 'administrateur'}</p>
+            <a href="/" className="mt-2 inline-flex min-h-[44px] items-center gap-2 text-sm font-semibold text-navy-500 hover:underline focus-visible:ring-2 focus-visible:ring-navy-500">
+              <Icon name="arrowRight" className="h-4 w-4 rotate-180" /> Voir le site
+            </a>
+            <div className="mt-4 border-t border-navy-100 pt-4">{nav}</div>
+            <button onClick={() => { void logoutAdmin().then(() => setToken(null)) }} className="mt-4 flex min-h-[44px] w-full items-center justify-center rounded-xl border border-navy-100 px-4 text-sm font-semibold text-ink hover:bg-mist focus-visible:ring-2 focus-visible:ring-navy-500">
+              Déconnexion
+            </button>
           </div>
-          {menuOpen && <div id="admin-menu" className="mt-4 rounded-3xl bg-white p-4 ring-1 ring-navy-100 lg:hidden">{nav}</div>}
+        </aside>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <img src="/images/logo.png" alt="" className="h-10 w-10 lg:hidden" />
+              <div>
+                <h1 className="font-display text-2xl font-semibold text-ink sm:text-3xl">Tableau de bord</h1>
+                <p className="text-sm text-ink/90">Groupe Scolaire Madeleine-Daniélou — Abidjan</p>
+                <p className="truncate text-xs text-ink/90 lg:hidden">{email}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <a href="/" className="hidden min-h-[44px] items-center rounded-full border border-navy-100 bg-white px-4 text-sm font-semibold text-navy-500 hover:bg-mist focus-visible:ring-2 focus-visible:ring-navy-500 sm:inline-flex">Voir le site</a>
+              <button onClick={() => setMenuOpen(true)} aria-label="Ouvrir le menu d’administration" className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-navy-100 bg-white text-ink lg:hidden"><Icon name="menu" className="h-5 w-5" /></button>
+            </div>
+          </div>
+          {menuOpen && (
+            <SlideOverDrawer title="Menu d’administration" onClose={() => setMenuOpen(false)}>
+              <p className="mb-4 truncate text-sm text-ink/90">{email || 'administrateur'}</p>
+              {nav}
+              <a href="/" className="mt-4 flex min-h-[44px] items-center gap-2 rounded-xl bg-navy-50 px-4 text-sm font-semibold text-navy-500">Voir le site</a>
+              <button onClick={() => { void logoutAdmin().then(() => setToken(null)) }} className="mt-4 flex min-h-[44px] w-full items-center justify-center rounded-xl border border-navy-100 px-4 text-sm font-semibold text-ink">Déconnexion</button>
+            </SlideOverDrawer>
+          )}
 
           {tab === 'overview' && (
             <section className="mt-8">
-              <h2 className="sr-only">Statistiques</h2>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
-                <div className="sm:col-span-1 lg:col-span-2"><KpiCard label="Pré-inscriptions" value={data.inscriptions.length} note={`${data.inscriptions.filter((i) => i.status === 'en_attente' || i.status === 'nouveau').length} en attente`} icon={<Icon name="cap" className="h-5 w-5" />} /></div>
-                <div className="sm:col-span-1 lg:col-span-2"><KpiCard label="Messages" value={data.messages.length} note={`${data.messages.filter((m) => !m.traite).length} non traités`} icon={<Icon name="mail" className="h-5 w-5" />} /></div>
-                <div className="sm:col-span-1 lg:col-span-1"><KpiCard label="Documents" value={data.documents.length} accent icon={<Icon name="fileText" className="h-5 w-5" />} /></div>
-                <div className="sm:col-span-1 lg:col-span-1"><KpiCard label="Podcasts" value={data.podcasts.length} accent icon={<Icon name="radio" className="h-5 w-5" />} /></div>
-                <div className="lg:col-span-3"><KpiCard label="Photos" value={data.photos.length} accent note={`${data.photos.filter((x) => x.featured).length} à la une`} icon={<Icon name="star" className="h-5 w-5" />} /></div>
-                <div className="rounded-3xl bg-navy-500 p-6 text-white lg:col-span-3">
-                  <p className="text-sm font-medium text-white/90">Dernière activité</p>
-                  <p className="font-display mt-3 text-2xl font-semibold">{data.inscriptions.length + data.messages.length + data.photos.length}</p>
-                  <p className="mt-2 text-xs text-white/90">nouveautés enregistrées dans la base</p>
-                </div>
+              <h2 className="sr-only">Vue d’ensemble</h2>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <KpiCard label="Pré-inscriptions" value={data.inscriptions.length} note="dossiers reçus" icon={<Icon name="cap" className="h-5 w-5" />} onClick={() => setTab('inscriptions')} />
+                <KpiCard label="Messages" value={data.messages.length} note={`${data.messages.filter((m) => !m.traite).length} non traités`} icon={<Icon name="mail" className="h-5 w-5" />} onClick={() => setTab('messages')} />
+                <KpiCard label="Documents" value={data.documents.length} note="fiches en ligne" accent icon={<Icon name="fileText" className="h-5 w-5" />} onClick={() => setTab('documents')} />
+                <KpiCard label="Photos" value={data.photos.length} note={`${data.photos.filter((x) => x.featured).length} à la une`} accent icon={<Icon name="star" className="h-5 w-5" />} onClick={() => setTab('photos')} />
               </div>
-              <div className="mt-6 grid gap-4 lg:grid-cols-2">
+
+              <div className="mt-6 grid gap-4 lg:grid-cols-3">
                 <div className="rounded-3xl bg-white p-6 ring-1 ring-navy-100">
-                  <h3 className="font-display text-lg font-semibold text-ink">Statuts des pré-inscriptions</h3>
-                  <div className="mt-5 space-y-3">
-                    {['nouveau', 'en_attente', 'validee', 'refusee'].map((s) => {
-                      const n = data.inscriptions.filter((i) => i.status === s).length
+                  <h3 className="font-display text-lg font-semibold text-ink">À traiter</h3>
+                  <ul className="mt-4 space-y-3">
+                    <li className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-mist p-4">
+                      <div>
+                        <p className="text-sm font-semibold text-ink">Nouvelles pré-inscriptions</p>
+                        <p className="mt-0.5 text-xs text-ink/90">{counts.inscriptions} dossiers à examiner</p>
+                      </div>
+                      <button type="button" onClick={() => setTab('inscriptions')} className="min-h-[44px] rounded-full bg-navy-500 px-4 text-sm font-semibold text-white hover:bg-navy-600 focus-visible:ring-2 focus-visible:ring-navy-500">Examiner</button>
+                    </li>
+                    <li className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-mist p-4">
+                      <div>
+                        <p className="text-sm font-semibold text-ink">Messages non traités</p>
+                        <p className="mt-0.5 text-xs text-ink/90">{counts.messages} messages en attente de réponse</p>
+                      </div>
+                      <button type="button" onClick={() => setTab('messages')} className="min-h-[44px] rounded-full bg-navy-500 px-4 text-sm font-semibold text-white hover:bg-navy-600 focus-visible:ring-2 focus-visible:ring-navy-500">Répondre</button>
+                    </li>
+                    {counts.inscriptions === 0 && counts.messages === 0 && (
+                      <li className="rounded-2xl border border-navy-100 p-4 text-sm text-ink/90">Tout est à jour — aucun dossier ni message en attente.</li>
+                    )}
+                  </ul>
+                </div>
+
+                <div className="rounded-3xl bg-white p-6 ring-1 ring-navy-100 lg:col-span-2">
+                  <h3 className="font-display text-lg font-semibold text-ink">Pré-inscriptions par statut</h3>
+                  <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                    {[
+                      { key: 'nouveau', label: 'Nouvelles', color: 'bg-navy-500' },
+                      { key: 'en_attente', label: 'En attente', color: 'bg-copper-500' },
+                      { key: 'validee', label: 'Validées', color: 'bg-success' },
+                      { key: 'refusee', label: 'Refusées', color: 'bg-ink/40' },
+                    ].map((s) => {
+                      const n = data.inscriptions.filter((i) => i.status === s.key).length
                       const pct = data.inscriptions.length ? Math.round((n / data.inscriptions.length) * 100) : 0
-                      return <div key={s}>
-                        <div className="flex justify-between text-xs text-ink/90"><span className="capitalize">{s.replace('_', ' ')}</span><strong className="tabular-nums">{n}</strong></div>
-                        <div className="mt-1 h-2 overflow-hidden rounded-full bg-navy-50"><div className="h-full rounded-full bg-navy-500 transition-[width] duration-300 ease-out" style={{ width: `${pct}%` }} /></div>
+                      return <div key={s.key}>
+                        <div className="flex justify-between text-xs text-ink/90"><span>{s.label}</span><strong className="tabular-nums">{n}</strong></div>
+                        <div className="mt-1 h-2 overflow-hidden rounded-full bg-navy-50"><div className={`h-full rounded-full ${s.color} transition-[width] duration-300 ease-out`} style={{ width: `${pct}%` }} /></div>
                       </div>
                     })}
                   </div>
                 </div>
+              </div>
+
+              <div className="mt-6 grid gap-4 lg:grid-cols-2">
                 <div className="rounded-3xl bg-white p-6 ring-1 ring-navy-100">
                   <h3 className="font-display text-lg font-semibold text-ink">Activité récente</h3>
                   <ul className="mt-4 divide-y divide-navy-100">
                     {[
-                      ...data.inscriptions.map((i) => ({ at: i.createdAt, label: `Pré-inscription ${i.elevePrenom} ${i.eleveNom}` })),
+                      ...data.inscriptions.map((i) => ({ at: i.createdAt, label: `Pré-inscription de ${i.elevePrenom} ${i.eleveNom}` })),
                       ...data.messages.map((m) => ({ at: m.createdAt, label: `Message de ${m.name}` })),
                     ].sort((a, b) => b.at.localeCompare(a.at)).slice(0, 5).map((x, i) => (
-                      <li key={i} className="flex justify-between gap-3 py-2 text-sm text-ink/90"><span className="min-w-0 truncate">{x.label}</span><span className="shrink-0 text-xs">{fmt(x.at)}</span></li>
+                      <li key={i} className="flex justify-between gap-3 py-2 text-sm text-ink/90"><span className="min-w-0 truncate">{x.label}</span><span className="shrink-0 text-xs">{relativeDate(x.at)}</span></li>
                     ))}
-                    {data.inscriptions.length + data.messages.length === 0 && <li className="py-4 text-sm text-ink/90">Aucune activité récente.</li>}
+                    {data.inscriptions.length + data.messages.length === 0 && <li className="py-4 text-sm text-ink/90">Aucune activité pour le moment. Les nouvelles demandes apparaîtront ici.</li>}
                   </ul>
+                </div>
+
+                <div className="rounded-3xl bg-white p-6 ring-1 ring-navy-100">
+                  <h3 className="font-display text-lg font-semibold text-ink">Actions rapides</h3>
+                  <div className="mt-4 grid grid-cols-2 gap-3">
+                    {[
+                      { label: 'Ajouter un document', icon: 'fileText', action: () => setTab('documents') },
+                      { label: 'Ajouter un podcast', icon: 'radio', action: () => setTab('podcasts') },
+                      { label: 'Ajouter des photos', icon: 'star', action: () => setTab('photos') },
+                      { label: 'Voir les actualités', icon: 'bookOpen', action: () => { window.location.href = '/actualites' } },
+                    ].map((a) => (
+                      <button key={a.label} type="button" onClick={a.action} className="flex min-h-[56px] items-center gap-2 rounded-2xl border border-navy-100 px-3 text-left text-sm font-semibold text-ink transition-colors hover:border-navy-300 hover:bg-mist focus-visible:ring-2 focus-visible:ring-navy-500">
+                        <Icon name={a.icon as 'fileText'} className="h-5 w-5 shrink-0 text-navy-500" />
+                        {a.label}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="mt-4 text-sm text-navy-500">Ce site est hébergé par le Groupe Scolaire Daniélou Abidjan.</p>
                 </div>
               </div>
             </section>
@@ -201,14 +333,41 @@ export default function AdminDashboardPage() {
 
           {tab === 'inscriptions' && (
             <section className="mt-8 rounded-3xl bg-white p-6 ring-1 ring-navy-100">
-              <div className="flex flex-wrap items-center gap-3">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {[
+                  { key: 'nouveau', label: 'Nouvelles', color: 'text-navy-500', bar: 'bg-navy-500' },
+                  { key: 'en_attente', label: 'En attente', color: 'text-copper-700', bar: 'bg-copper-500' },
+                  { key: 'validee', label: 'Validées', color: 'text-success', bar: 'bg-success' },
+                  { key: 'refusee', label: 'Refusées', color: 'text-ink/90', bar: 'bg-ink/40' },
+                ].map((s) => {
+                  const n = data.inscriptions.filter((i) => i.status === s.key).length
+                  return (
+                    <div key={s.key} className="rounded-2xl bg-mist p-4">
+                      <p className="text-xs font-medium text-ink/90">{s.label}</p>
+                      <p className={`font-display mt-1 text-2xl font-semibold tabular-nums ${s.color}`}>{n}</p>
+                      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white"><div className={`h-full ${s.bar}`} style={{ width: `${data.inscriptions.length ? Math.round((n / data.inscriptions.length) * 100) : 0}%` }} /></div>
+                    </div>
+                  )
+                })}
+              </div>
+              <div className="mt-4 rounded-2xl border border-navy-100 p-4">
+                <h2 className="text-sm font-semibold text-ink">Répartition par niveau</h2>
+                <div className="mt-3 flex flex-wrap gap-3">
+                  {['Maternelle', 'Primaire', 'Collège', 'Lycée', 'Autre'].map((l) => {
+                    const n = data.inscriptions.filter((i) => levelOf(i.classe) === l).length
+                    if (!n && l === 'Autre') return null
+                    return <span key={l} className="rounded-full bg-navy-50 px-3 py-1.5 text-xs font-semibold text-navy-500">{l} : {n}</span>
+                  })}
+                </div>
+              </div>
+              <div className="mt-6 flex flex-wrap items-center gap-3">
                 <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Référence, élève, parent…" aria-label="Rechercher une pré-inscription" className="min-h-[44px] flex-1 rounded-xl border border-navy-200 px-4 text-ink" />
                 <select value={filterClasse} onChange={(e) => setFilterClasse(e.target.value)} aria-label="Filtrer par classe" className="min-h-[44px] rounded-xl border border-navy-200 px-4 text-ink"><option value="">Toutes les classes</option>{[...new Set(data.inscriptions.map((i) => i.classe))].map((c) => <option key={c}>{c}</option>)}</select>
                 <select value={filterStatut} onChange={(e) => setFilterStatut(e.target.value)} aria-label="Filtrer par statut" className="min-h-[44px] rounded-xl border border-navy-200 px-4 text-ink"><option value="">Tous les statuts</option>{['nouveau', 'en_attente', 'validee', 'refusee'].map((s) => <option key={s}>{s}</option>)}</select>
                 <button onClick={exportCsv} className="min-h-[44px] rounded-full bg-navy-500 px-5 font-semibold text-white">Exporter CSV</button>
               </div>
               <div className="mt-6">
-                <DataTable rows={filteredInscriptions} loading={loading} empty="Aucune pré-inscription."
+                <DataTable rows={filteredInscriptions} loading={loading} empty="Aucune pré-inscription pour le moment. Les nouvelles demandes apparaîtront ici."
                   columns={[
                     { key: 'ref', label: 'Référence', render: (i) => <button onClick={() => setDrawer(i.id)} className="text-navy-500 underline">{i.reference}</button> },
                     { key: 'eleve', label: 'Élève', render: (i) => `${i.elevePrenom} ${i.eleveNom}` },
@@ -264,7 +423,7 @@ export default function AdminDashboardPage() {
                 ]} />
             </section>
           )}
-        </main>
+        </div>
       </div>
 
       {drawer && (() => {
@@ -297,7 +456,7 @@ function MediaPanel({ kind, items, loading, upload, setUpload, onUpload, onDelet
         <button onClick={onUpload} className="min-h-[44px] rounded-full bg-navy-500 px-6 font-semibold text-white sm:col-span-2">Ajouter</button>
       </div>
       <div className="mt-6">
-        <DataTable rows={items as { id: string }[]} loading={loading} empty={`Aucun élément dans ${kind}.`}
+        <DataTable rows={items as { id: string }[]} loading={loading} empty={`Aucun élément dans ${kind} pour le moment.`}
           columns={[
             { key: 'title', label: 'Titre', render: (x) => 'title' in x ? String(x.title) : '' },
             { key: 'meta', label: kind === 'documents' ? 'Section' : 'Durée', render: (x) => kind === 'documents' ? ('section' in x ? String(x.section) : '') : ('duration' in x ? String(x.duration) : '') },
