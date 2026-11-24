@@ -15,7 +15,7 @@ export default function About() {
     <section id="apropos" className="scroll-mt-24 bg-white py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
-          <SectionHeader
+          <SectionHeader as="h1"
             eyebrow="Qui sommes-nous ?"
             title={about.title}
             subtitle={about.accent}

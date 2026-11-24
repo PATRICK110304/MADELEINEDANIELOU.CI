@@ -9,7 +9,7 @@ export default function InfrastructuresPage() {
     <div className="bg-white py-20 lg:py-28">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <Reveal>
-          <SectionHeader eyebrow="L'école" title="Nos infrastructures" subtitle="Le campus de Bingerville Agbassi en images — salles, espaces et vie quotidienne." />
+          <SectionHeader as="h1" eyebrow="L'école" title="Nos infrastructures" subtitle="Le campus de Bingerville Agbassi en images — salles, espaces et vie quotidienne." />
         </Reveal>
         <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {galerieEvents.map((e) => (

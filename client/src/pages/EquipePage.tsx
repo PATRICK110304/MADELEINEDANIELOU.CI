@@ -7,7 +7,7 @@ export default function EquipePage() {
     <div className="bg-white py-20 lg:py-28">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <Reveal>
-          <SectionHeader eyebrow="L'école" title="Notre équipe" subtitle="L'équipe du Groupe Scolaire Madeleine-Daniélou, Abidjan." />
+          <SectionHeader as="h1" eyebrow="L'école" title="Notre équipe" subtitle="L'équipe du Groupe Scolaire Madeleine-Daniélou, Abidjan." />
         </Reveal>
       </div>
       <MotDirection />

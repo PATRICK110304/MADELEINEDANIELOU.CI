@@ -60,10 +60,18 @@ export default function App() {
   const isAdmin = pathname.startsWith('/admin')
   return (
     <div className="flex min-h-screen flex-col">
+      {!isAdmin && (
+        <a
+          href="#contenu"
+          className="sr-only z-[100] rounded-full bg-navy-500 px-5 py-3 text-sm font-semibold text-white focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+        >
+          Aller au contenu
+        </a>
+      )}
       {!isAdmin && <Navbar />}
       <ScrollManager />
 
-      <main className={`flex-1 ${isAdmin ? '' : 'pt-[104px]'}`}>
+      <main id="contenu" className={`flex-1 ${isAdmin ? '' : 'pt-[68px] lg:pt-[104px]'}`}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/qui-sommes-nous" element={<AboutPage />} />

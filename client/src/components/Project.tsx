@@ -17,7 +17,7 @@ export default function Project() {
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
-          <SectionHeader
+          <SectionHeader as="h1"
             eyebrow="Projet éducatif"
             title="Une éducation selon l'esprit"
             subtitle={projetEducatif.intro}

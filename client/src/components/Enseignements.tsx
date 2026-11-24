@@ -21,7 +21,7 @@ export default function Enseignements() {
     <section id="enseignements" className="mesh-mist scroll-mt-24 py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
-          <SectionHeader
+          <SectionHeader as="h1"
             eyebrow="Enseignements"
             title="Du préscolaire au lycée"
             subtitle="Quatre cycles, un même projet pédagogique : former des jeunes filles responsables, réfléchies et ouvertes sur le monde."

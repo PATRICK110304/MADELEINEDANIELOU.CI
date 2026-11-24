@@ -89,12 +89,13 @@ export default function Navbar() {
 
       {/* ============ Ligne 1 : logo + téléphone + CTA ============ */}
       <div className="relative mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-        <Link to="/" className="group flex items-center gap-3" aria-label="Accueil — Groupe Scolaire Daniélou Abidjan">
+        <Link to="/" className="group flex items-center gap-3">
           <Logo size={48} />
           <span className="leading-tight">
-            <span className="font-display block text-base font-semibold text-ink sm:text-lg">Daniélou Abidjan</span>
-            <span className="block text-[0.75rem] font-medium tracking-[0.28em] text-navy-500 uppercase">Groupe Scolaire · Abidjan</span>
+            <span className="font-display block whitespace-nowrap text-sm font-semibold text-ink sm:text-lg">Daniélou Abidjan</span>
+            <span className="block whitespace-nowrap text-[0.6rem] font-medium tracking-[0.14em] text-navy-500 uppercase sm:text-[0.75rem] sm:tracking-[0.28em]">Groupe Scolaire · Abidjan</span>
           </span>
+          <span className="sr-only"> — Accueil</span>
         </Link>
 
         <div className="flex items-center gap-4">
@@ -104,10 +105,11 @@ export default function Navbar() {
             {contact.telephone}
           </a><SmartLink
             href="/inscriptions#preinscription"
-            className="group inline-flex items-center gap-2 rounded-full bg-navy-500 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-navy-500/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-navy-600 hover:shadow-lg"
+            className="group inline-flex items-center gap-2 rounded-full bg-navy-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-md sm:px-5 sm:py-3 shadow-navy-500/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-navy-600 hover:shadow-lg"
           >
-            <Icon name="cap" className="h-5 w-5" />
-            Pré-inscription
+            <Icon name="cap" className="h-5 w-5 shrink-0" />
+            <span className="sm:hidden">Inscription</span>
+            <span className="hidden sm:inline">Pré-inscription</span>
           </SmartLink>
           {/* Hamburger mobile */}
           <button
@@ -134,6 +136,7 @@ export default function Navbar() {
                 className={`relative flex items-center gap-1 px-2.5 py-2.5 text-[0.78rem] font-medium leading-tight transition-colors xl:text-[0.82rem] ${
                   isActive(link.href) ? 'font-semibold text-navy-500' : 'text-ink hover:text-navy-500'
                 }`}
+                aria-haspopup={link.children ? 'true' : undefined}
               >
                 {link.label}
                 {link.children && <Caret className="h-3 w-3 text-navy-500 transition-colors group-hover:text-navy-500" />}
@@ -148,7 +151,7 @@ export default function Navbar() {
 
               {/* ----- Menu déroulant : blanc bordé ----- */}
               {link.children && (
-                <ul className="invisible absolute left-0 top-full z-50 min-w-56 translate-y-2 rounded-2xl border border-navy-100 bg-white p-2 opacity-0 shadow-xl shadow-ink/10 transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
+                <ul className="invisible absolute left-0 top-full z-50 min-w-56 translate-y-2 rounded-2xl border border-navy-100 bg-white p-2 opacity-0 shadow-xl shadow-ink/10 transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
                   {link.children.map((c) => (
                     <li key={c.label}>
                       <SmartLink

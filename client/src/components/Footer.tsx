@@ -71,7 +71,7 @@ export default function Footer() {
 
           {/* ----- Navigation multi-pages ----- */}
           <nav aria-label="Liens rapides">
-            <h3 className="text-[0.85rem] font-semibold tracking-[0.25em] text-navy-500 uppercase">Navigation</h3>
+            <h2 className="text-[0.85rem] font-semibold tracking-[0.25em] text-navy-500 uppercase">Navigation</h2>
             <ul className="mt-5 space-y-3">
               {navLinks.map((link) => (
                 <li key={link.href}>
@@ -86,7 +86,7 @@ export default function Footer() {
 
           {/* ----- Coordonnées ----- */}
           <div>
-            <h3 className="text-[0.85rem] font-semibold tracking-[0.25em] text-navy-500 uppercase">Contact</h3>
+            <h2 className="text-[0.85rem] font-semibold tracking-[0.25em] text-navy-500 uppercase">Contact</h2>
             <ul className="mt-5 space-y-4 text-sm text-ink/95">
               <li className="flex items-start gap-3">
                 <Icon name="mapPin" className="mt-0.5 h-4 w-4 shrink-0 text-navy-500" />
@@ -131,7 +131,7 @@ export default function Footer() {
           {/* ----- Carte admissions : blanche bordée, fin trait orange ----- */}
           <div className="relative overflow-hidden rounded-3xl border border-navy-100 bg-white p-6">
             <span className="absolute right-0 top-0 h-1 w-1/3 bg-copper-500" aria-hidden="true" />
-            <h3 className="text-[0.85rem] font-semibold tracking-[0.25em] text-navy-500 uppercase">Admissions</h3>
+            <h2 className="text-[0.85rem] font-semibold tracking-[0.25em] text-navy-500 uppercase">Admissions</h2>
             <p className="mt-3 text-sm leading-relaxed text-ink/95">
               Les pré-inscriptions pour la rentrée 2026 – 2027 sont ouvertes. Les places restantes sont limitées.
             </p>
@@ -146,7 +146,7 @@ export default function Footer() {
 
           {/* ----- Pages utiles : toutes les pages du site ----- */}
           <nav aria-label="Pages utiles du site">
-            <h3 className="text-[0.85rem] font-semibold tracking-[0.25em] text-navy-500 uppercase">Pages utiles</h3>
+            <h2 className="text-[0.85rem] font-semibold tracking-[0.25em] text-navy-500 uppercase">Pages utiles</h2>
             <ul className="mt-5 grid grid-cols-2 gap-x-6 gap-y-2.5 sm:grid-cols-3 lg:grid-cols-4">
               {pagesUtiles.map((p) => (
                 <li key={p.href}>
@@ -166,14 +166,14 @@ export default function Footer() {
 
       {/* ----- Barre de copyright ----- */}
       <div className="border-t border-navy-100">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-6 text-center text-xs text-ink/65 sm:flex-row sm:px-6 lg:px-8 lg:text-left">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-6 text-center text-xs text-ink/90 sm:flex-row sm:px-6 lg:px-8 lg:text-left">
           <p>© {new Date().getFullYear()} Groupe Scolaire Daniélou Abidjan — Tous droits réservés.</p>
           <p className="flex items-center gap-2">
-            Excellence académique à <span className="font-semibold text-copper-500">Abidjan</span> · Côte d'Ivoire
+            Excellence académique à <span className="font-semibold text-copper-700">Abidjan</span> · Côte d'Ivoire
             <Link
               to="/admin/dashboard"
               aria-label="Espace de gestion du site"
-              className="ml-1 text-xs text-ink/75 underline-offset-4 transition-colors hover:text-navy-500 hover:underline focus-visible:ring-2 focus-visible:ring-navy-300"
+              className="ml-1 text-xs text-ink/90 underline-offset-4 transition-colors hover:text-navy-500 hover:underline focus-visible:ring-2 focus-visible:ring-navy-300"
             >
               Gestion
             </Link>

@@ -13,7 +13,7 @@
  * @param {boolean} light     Mode sur photo (texte clair)
  * @param {string}  align     'center' (défaut) | 'left'
  */
-export default function SectionHeader({ eyebrow, title, subtitle, light = false, align = 'center' }) {
+export default function SectionHeader({ eyebrow, title, subtitle, light = false, align = 'center', as = 'h2' }) {
   const centered = align === 'center'
   return (
     <div className={`mx-auto mb-12 max-w-2xl lg:mb-16 ${centered ? 'text-center' : 'text-left'}`}>
@@ -24,9 +24,11 @@ export default function SectionHeader({ eyebrow, title, subtitle, light = false,
         {centered && <span className="h-px w-8 bg-copper-400" aria-hidden="true" />}
       </p>
 
-      <h2 className={`font-display text-3xl leading-tight font-semibold sm:text-4xl lg:text-[2.6rem] ${light ? 'text-white' : 'text-copper-500'}`}>
-        {title}
-      </h2>
+      {as === 'h1' ? (
+        <h1 className={`font-display text-3xl leading-tight font-semibold sm:text-4xl lg:text-[2.6rem] ${light ? 'text-white' : 'text-copper-600'}`}>{title}</h1>
+      ) : (
+        <h2 className={`font-display text-3xl leading-tight font-semibold sm:text-4xl lg:text-[2.6rem] ${light ? 'text-white' : 'text-copper-600'}`}>{title}</h2>
+      )}
 
       {subtitle && (
         <p className={`mt-4 text-base leading-relaxed sm:text-lg ${light ? 'text-white/90' : 'text-ink/95'}`}>

@@ -12,7 +12,7 @@ export default function ActualitesOfficielles() {
     <section className="bg-mist py-20 lg:py-28">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <Reveal>
-          <SectionHeader eyebrow="Vie du GSMD" title="Actualités de l'établissement" subtitle="Groupe Scolaire Madeleine-Daniélou, Abidjan" />
+          <SectionHeader as="h1" eyebrow="Vie du GSMD" title="Actualités de l'établissement" subtitle="Groupe Scolaire Madeleine-Daniélou, Abidjan" />
         </Reveal>
         <ol className="mt-12 divide-y divide-navy-100 border-y border-navy-100">
           {actualitesInfo.map((a) => (

@@ -13,23 +13,24 @@
 // ============================================================
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { heroSlides, heroBadges, heroExtraImages } from '../data/content'
+import { heroSlides, heroBadges } from '../data/content'
 import Icon from './Icons'
 
 const SLIDE_INTERVAL = 9500 // ms entre deux diapositives
 
 export default function HeroSlider() {
   const [index, setIndex] = useState(0)
+  const [paused, setPaused] = useState(false)
+  /* Trois diapositives officielles suffisent : on ne recycle pas les mêmes
+   textes sur six photos supplémentaires. */
+  const allSlides = heroSlides
 
   useEffect(() => {
+    if (paused || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const id = setInterval(() => setIndex((i) => (i + 1) % allSlides.length), SLIDE_INTERVAL)
     return () => clearInterval(id)
-  }, [])
+  }, [paused, allSlides.length])
 
-  /* Fonds supplémentaires : on réutilise les textes officiels existants,
-   sans inventer de nouveau contenu */
-const slides = heroExtraImages.map((image, i) => ({ ...heroSlides[i % heroSlides.length], image }))
-const allSlides = [...heroSlides, ...slides]
   const slide = allSlides[index]
   const go = (i) => setIndex((i + allSlides.length) % allSlides.length)
 
@@ -57,10 +58,10 @@ const allSlides = [...heroSlides, ...slides]
       />
 
       {/* ----- Zone de texte : min-h fixe, titre line-clamp-4, p line-clamp-3 ----- */}
-      <div className="relative z-10 flex min-h-[55vh] items-center justify-center px-4 pt-20 sm:px-6 lg:px-8">
+      <div className="relative z-10 flex min-h-[320px] items-center justify-center sm:min-h-[380px] px-4 pt-20 sm:px-6 lg:px-8">
         <div className="w-full max-w-[75ch] lg:max-w-[75ch]">
           {/* Titre serif Playfair très grand, blanc, aucune coupe */}
-          <h1 className="font-display text-white leading-[1.05] font-semibold drop-shadow-[0_2px_16px_rgb(8_40_80_/_0.4)] sm:text-4xl lg:text-[3.75rem]">
+          <h1 className="font-display text-3xl leading-[1.05] font-semibold text-white line-clamp-4 sm:text-4xl lg:text-[3.75rem] drop-shadow-[0_2px_16px_rgb(8_40_80_/_0.4)]">
             {slide.titleLine}{' '}
             <span className="text-[#FF9A6B]">{slide.titleAccent}</span>
           </h1>
@@ -76,7 +77,7 @@ const allSlides = [...heroSlides, ...slides]
       <div className="relative z-10 flex justify-center py-6">
         <Link
           to={slide.cta.href}
-          className="inline-flex items-center gap-2 rounded-full bg-navy-500 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-navy-500/30 transition-all duration-300 hover:bg-navy-600 hover:translate-y-0.5 hover:shadow-xl"
+          className="inline-flex items-center gap-2 rounded-full bg-navy-500 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-navy-500/30 transition-colors duration-200 hover:bg-navy-600 hover:translate-y-0.5 hover:shadow-xl"
         >
           {slide.cta.label}
           <Icon name="arrowRight" className="h-5 w-5 transition-transform group-hover:translate-x-1" />
@@ -93,17 +94,30 @@ const allSlides = [...heroSlides, ...slides]
         ))}
       </div>
 
-      {/* ----- Points de navigation du carrousel ----- */}
+      {/* ----- Contrôles du carrousel : pause + points (cibles 44 px) ----- */}
       <div className="relative z-10 mt-8 flex items-center justify-center gap-3 pb-4">
+        <button
+          type="button"
+          onClick={() => setPaused((v) => !v)}
+          aria-pressed={paused}
+          aria-label={paused ? 'Reprendre le défilement des photos' : 'Mettre en pause le défilement des photos'}
+          className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-white/20 px-3 text-sm font-semibold text-white transition-colors hover:bg-white/30 focus-visible:ring-2 focus-visible:ring-white/80"
+        >
+          <Icon name={paused ? 'play' : 'pause'} className="h-4 w-4" />
+        </button>
         {allSlides.map((_, i) => (
           <button
             key={i}
+            type="button"
             onClick={() => go(i)}
             aria-label={`Aller à la diapositive ${i + 1}`}
-            className={`h-2.5 rounded-full transition-all duration-300 ${
-              i === index ? 'w-10 bg-navy-500' : 'w-2.5 bg-ink/20 hover:bg-ink/40'
-            }`}
-          />
+            aria-current={i === index ? 'true' : undefined}
+            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full focus-visible:ring-2 focus-visible:ring-white/80"
+          >
+            <span className={`block h-2.5 rounded-full transition-[width,background-color] duration-300 ${
+              i === index ? 'w-10 bg-navy-500' : 'w-2.5 bg-white/70'
+            }`} />
+          </button>
         ))}
       </div>
     </section>

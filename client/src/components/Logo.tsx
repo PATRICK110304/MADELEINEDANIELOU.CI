@@ -8,7 +8,7 @@
 export default function Logo({ size = 48 }: { size?: number }) {
   return (
     <span
-      className="relative flex aspect-square items-center justify-center overflow-hidden rounded-full border-2 border-copper-500 bg-white transition-transform duration-300 group-hover:scale-105"
+      className="relative flex shrink-0 aspect-square items-center justify-center overflow-hidden rounded-full border-2 border-copper-500 bg-white transition-transform duration-300 group-hover:scale-105"
       style={{ width: size, height: size }}
     >
       <img

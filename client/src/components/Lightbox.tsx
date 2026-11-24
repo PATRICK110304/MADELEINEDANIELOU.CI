@@ -13,6 +13,8 @@ import Icon from './Icons'
 
 export default function Lightbox({ images, index, onClose, onNext, onPrev, onClickImage, darkBg = true }) {
   const dialogRef = useRef<HTMLDivElement>(null)
+  const closeRef = useRef<HTMLButtonElement>(null)
+  const touchStartX = useRef(0)
 
   // Scroll bloqué pendant l'ouverture
   useEffect(() => {
@@ -20,12 +22,29 @@ export default function Lightbox({ images, index, onClose, onNext, onPrev, onCli
     return () => { document.body.style.overflow = '' }
   }, [])
 
-  // Flèches clavier + Échap
+  // Focus : placement à l'ouverture, piège Tab, restauration à la fermeture
+  useEffect(() => {
+    const previous = document.activeElement as HTMLElement | null
+    closeRef.current?.focus()
+    return () => previous?.focus()
+  }, [])
+
+  // Flèches clavier + Échap + piège de focus
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight') onNext()
       else if (e.key === 'ArrowLeft') onPrev()
       else if (e.key === 'Escape') onClose()
+      else if (e.key === 'Tab') {
+        const focusables = dialogRef.current?.querySelectorAll<HTMLElement>(
+          'button, [href], [tabindex]:not([tabindex="-1"])',
+        )
+        if (!focusables?.length) return
+        const first = focusables[0]
+        const last = focusables[focusables.length - 1]
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus() }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus() }
+      }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -57,6 +76,7 @@ export default function Lightbox({ images, index, onClose, onNext, onPrev, onCli
         {/* Barre du haut : RETOUR explicite + compteur */}
         <div className="flex items-center justify-between gap-3 px-4 pt-4 text-white">
           <button
+            ref={closeRef}
             type="button"
             onClick={onClose}
             aria-label="Retour aux photos de la galerie"
@@ -69,9 +89,17 @@ export default function Lightbox({ images, index, onClose, onNext, onPrev, onCli
         </div>
 
         {/* Image principale */}
-        <div
-          className="flex-1 flex items-center justify-center overflow-hidden transition-transform"
+        <button
+          type="button"
+          className="flex flex-1 cursor-pointer items-center justify-center overflow-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/80"
+          aria-label="Photo suivante"
           onClick={onClickImage}
+          onTouchStart={(e) => { touchStartX.current = e.changedTouches[0].clientX }}
+          onTouchEnd={(e) => {
+            const delta = e.changedTouches[0].clientX - touchStartX.current
+            if (delta > 50) onPrev()
+            else if (delta < -50) onNext()
+          }}
         >
           <img
             src={img}
@@ -80,7 +108,7 @@ export default function Lightbox({ images, index, onClose, onNext, onPrev, onCli
             decoding="async"
             className="max-h-[85vh] w-auto object-contain transition-opacity duration-300"
           />
-        </div>
+        </button>
 
         {/* Naviguer : flèches */}
         <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-4 px-4">
@@ -88,7 +116,7 @@ export default function Lightbox({ images, index, onClose, onNext, onPrev, onCli
             type="button"
             onClick={onPrev}
             aria-label="Photo précédente"
-            className="rounded-full bg-white/20 p-3 transition-colors hover:bg-white/30 focus:ring-2 focus:ring-white/80"
+            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-white/20 p-3 transition-colors hover:bg-white/30 focus-visible:ring-2 focus-visible:ring-white/80"
           >
             <Icon name="chevronLeft" className="h-6 w-6" />
           </button>
@@ -96,7 +124,7 @@ export default function Lightbox({ images, index, onClose, onNext, onPrev, onCli
             type="button"
             onClick={onNext}
             aria-label="Photo suivante"
-            className="rounded-full bg-white/20 p-3 transition-colors hover:bg-white/30 focus:ring-2 focus:ring-white/80"
+            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-white/20 p-3 transition-colors hover:bg-white/30 focus-visible:ring-2 focus-visible:ring-white/80"
           >
             <Icon name="chevronRight" className="h-6 w-6" />
           </button>

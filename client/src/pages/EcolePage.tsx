@@ -12,7 +12,7 @@ export default function EcolePage() {
     <div className="bg-white py-20 lg:py-28">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <Reveal>
-          <SectionHeader
+          <SectionHeader as="h1"
             eyebrow="Notre école"
             title={ecole.nom}
             subtitle={ecole.nature}

@@ -52,7 +52,7 @@ export default function Inscriptions() {
     <section id="inscriptions" className="scroll-mt-24 bg-white py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
-          <SectionHeader
+          <SectionHeader as="h1"
             eyebrow="Inscriptions & Documents"
             title="Tout ce qu'il faut pour s'inscrire"
             subtitle="Téléchargez librement les fiches d'inscription et documents officiels de l'établissement, mis à jour par notre secrétariat."

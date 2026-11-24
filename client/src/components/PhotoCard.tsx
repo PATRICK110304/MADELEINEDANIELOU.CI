@@ -32,7 +32,7 @@ export default function PhotoCard({
   const body = (
     <>
       {/* Photo nette — absolue, derrière le contenu */}
-      <img src={image} alt={alt} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+      <img src={image} alt={alt} loading="lazy" decoding="async" width="1600" height="1000" className="absolute inset-0 h-full w-full object-cover" />
       {/* Dégradé sombre renforcé : fond du texte quasi opaque,
           puis fondu progressif vers le haut de la photo */}
       <div
@@ -47,9 +47,9 @@ export default function PhotoCard({
             {label}
           </p>
         )}
-        <h3 className="font-display text-2xl font-semibold leading-tight text-white line-clamp-3 sm:text-3xl lg:text-4xl" style={shadow}>
+        <h2 className="font-display text-2xl font-semibold leading-tight text-white line-clamp-3 sm:text-3xl lg:text-4xl" style={shadow}>
           {title}
-        </h3>
+        </h2>
         {desc && <p className="text-[0.9rem] leading-relaxed text-white/90 line-clamp-2 sm:text-base" style={shadow}>{desc}</p>}
         {buttonLabel && (
           <span className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-white transition-transform duration-300 group-hover:translate-x-1" style={shadow}>
@@ -60,10 +60,10 @@ export default function PhotoCard({
     </>
   )
 
-  const shell = `relative flex flex-col overflow-hidden rounded-3xl ring-1 ring-navy-100 transition-transform duration-300 hover:-translate-y-1 ${className}`
+  const shell = `relative flex min-h-[380px] w-full flex-col overflow-hidden rounded-3xl text-left ring-1 ring-navy-100 transition-transform duration-300 hover:-translate-y-1 ${className}`
 
   if (href) {
     return <Link id={id} to={href} className={`group ${shell}`} onClick={onClick}>{body}</Link>
   }
-  return <div id={id} className={`group ${shell}`} onClick={onClick}>{body}</div>
+  return <button type="button" id={id} className={`group ${shell}`} onClick={onClick} aria-label={typeof buttonLabel === 'string' ? buttonLabel : undefined}>{body}</button>
 }

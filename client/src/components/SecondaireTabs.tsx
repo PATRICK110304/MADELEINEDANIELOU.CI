@@ -175,7 +175,7 @@ export default function SecondaireTabs() {
                       className="flex items-center justify-between gap-3 rounded-2xl bg-white px-5 py-3.5 ring-1 ring-navy-100 transition-shadow duration-300 hover:shadow-md hover:shadow-ink/5"
                     >
                       <span className="text-sm font-semibold text-ink">{l.label}</span>
-                      <span className="text-xs font-medium text-ink/65">{l.detail}</span>
+                      <span className="text-xs font-medium text-ink/90">{l.detail}</span>
                     </li>
                   ))}
                 </ul>
@@ -190,7 +190,7 @@ export default function SecondaireTabs() {
                 </ul>
                 {/* Méthodologie */}
                 <div className="mt-7 rounded-2xl border border-navy-100 bg-white p-4 text-xs leading-relaxed text-ink/80">
-                  <span className="font-semibold text-copper-500">Méthodologie — </span>
+                  <span className="font-semibold text-copper-700">Méthodologie — </span>
                   {enseignements.methode}
                 </div>
               </div>

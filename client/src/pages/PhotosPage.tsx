@@ -17,7 +17,7 @@ export default function PhotosPage() {
     <section className="bg-white py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
-          <SectionHeader eyebrow="Galerie" title="La vie du GSMD en photos" subtitle="Cérémonies, vie scolaire, culture et sport — photos optimisées et orientées automatiquement." />
+          <SectionHeader as="h1" eyebrow="Galerie" title="La vie du GSMD en photos" subtitle="Cérémonies, vie scolaire, culture et sport — photos optimisées et orientées automatiquement." />
         </Reveal>
         <div className="mb-8 flex flex-wrap gap-2" role="tablist" aria-label="Filtrer les photos">
           {SECTIONS.map((s) => (

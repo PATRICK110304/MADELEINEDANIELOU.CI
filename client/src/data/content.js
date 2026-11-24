@@ -458,7 +458,7 @@ export const heroSlides = [
     eyebrow: 'Groupe Scolaire Madeleine-Daniélou · Abidjan',
     titleLine: 'Quand une conscience',
     titleAccent: 'rencontre une confiance…',
-    text: 'Ancré à Cocody, le Groupe Scolaire Madeleine-Daniélou accueille les élèves de la maternelle au lycée dans une éducation d’excellence, humaine et engagée.',
+    text: 'Ancré à Bingerville, le Groupe Scolaire Madeleine-Daniélou accueille les élèves de la maternelle au lycée dans une éducation d’excellence, humaine et engagée.',
     image: '/images/hero-ceremonie_up1600.webp',
     cta: { label: 'Pré-inscription en ligne', href: '/inscriptions#preinscription' },
     secondary: { label: 'La vie du collège', href: '/actualites' },
@@ -496,7 +496,7 @@ export const heroExtraImages = [
 
 /* ---------- Badges flottants du hero ---------- */
 export const heroBadges = [
-  { value: '6ème', label: 'Rentrée scolaire du GSMD' },
+  { value: '2026', label: 'Rentrée scolaire 2026 – 2027' },
   { value: 'UNESCO', label: 'École associée' },
   { value: '3', label: 'Cycles d’enseignement' },
 ]

@@ -22,7 +22,7 @@ export default function GalerieEventPage() {
         <SectionHeader
           eyebrow="Galerie"
           title="Événement introuvable"
-          subtitle={`L'événement ${slug ? `« ${slug} »` : ''} n'existe pas dans la galerie du site. Vérifiez le nom du dossier (public/galerie/).`}
+          subtitle="Cette galerie n'est pas disponible. Retrouvez toutes les galeries d'événements depuis la page Galerie photos."
         />
         <Link to="/galerie" className="mt-6 inline-flex items-center gap-2 rounded-full bg-navy-500 px-6 py-3 text-base font-semibold text-white hover:bg-navy-600">
           ← Toutes les galeries
@@ -42,10 +42,10 @@ export default function GalerieEventPage() {
           </div>
 
           <Reveal>
-            <SectionHeader
+            <SectionHeader as="h1"
               eyebrow="Galerie photo"
-              title={event.title || (event.slug === 'vie-scolaire-2026' ? 'Vie scolaire — galerie photos' : event.slug)}
-              subtitle={event.date ? `${event.date} — ${event.description || ''}` : event.slug === 'vie-scolaire-2026' ? 'Titre, date et description à compléter — photos de la vie scolaire du GSMD.' : '(Informations à compléter)'}
+              title={event.title || 'Galerie photos'}
+              subtitle={event.date ? `${event.date} — ${event.description || ''}` : 'Photos de l’événement.'}
               align="left"
             />
           </Reveal>
@@ -58,21 +58,27 @@ export default function GalerieEventPage() {
             {event.vignettes.map((src, i) => {
               const p = Math.min(event.photos.length - 1, Math.round((i / Math.max(1, event.vignettes.length - 1)) * event.photos.length))
               return (
-                <img
+                <button
                   key={src}
-                  src={src}
-                  alt={`${event.title || (event.slug === 'vie-scolaire-2026' ? 'Vie scolaire' : event.slug)} — photo ${i + 1}`}
-                  loading="lazy"
-                  decoding="async"
-                  className="group w-full cursor-pointer overflow-hidden rounded-2xl shadow-md shadow-ink/5 ring-1 ring-navy-100 transition-transform duration-500 hover:scale-[1.02]"
+                  type="button"
                   onClick={() => setLbIndex(p)}
-                />
+                  aria-label={`Ouvrir la photo ${i + 1} de ${event.title || 'la galerie'}`}
+                  className="group block w-full overflow-hidden rounded-2xl shadow-md shadow-ink/5 ring-1 ring-navy-100 transition-transform duration-500 hover:scale-[1.02] focus-visible:ring-2 focus-visible:ring-navy-500"
+                >
+                  <img
+                    src={src}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    width="800"
+                    height="600"
+                    className="w-full"
+                  />
+                </button>
               )
             })}
             {event.photos.length > 0 && event.vignettes.length === 0 && (
-              <p className="columns-span all text-xs text-ink/90">
-                Aucune vignette dans « {event.slug}/vignettes » — verser les photos : {event.photos.join(', ')}
-              </p>
+              <p className="text-sm text-ink/90">Les photos de cet événement seront publiées prochainement.</p>
             )}
           </div>
         </div>

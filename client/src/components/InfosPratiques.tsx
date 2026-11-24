@@ -21,7 +21,7 @@ export default function InfosPratiques() {
     <section id="infos" className="scroll-mt-24 bg-white py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
-          <SectionHeader
+          <SectionHeader as="h1"
             eyebrow="Vie scolaire"
             title="Informations pratiques"
             subtitle="Scolarité, cantine, transports, fournitures et règlements : toutes les informations officielles de l'année 2026 – 2027, directement intégrées."

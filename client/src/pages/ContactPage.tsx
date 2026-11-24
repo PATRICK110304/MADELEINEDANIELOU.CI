@@ -16,7 +16,7 @@ export default function ContactPage() {
     <section className="bg-white py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
-          <SectionHeader
+          <SectionHeader as="h1"
             eyebrow="Contact"
             title="Écrire, appeler, nous rendre visite"
             subtitle="Le secrétariat du Groupe Scolaire Daniélou Abidjan vous accueille et répond à toutes vos questions."
