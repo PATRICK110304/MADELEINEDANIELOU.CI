@@ -93,3 +93,29 @@ npx lighthouse https://madeleinedanielou.ci --only-categories=accessibility
 ```
 
 Contrôler aussi : formulaire de contact (email reçu), pré-inscription (ligne dans Supabase), login `/admin/dashboard`, galerie et lightbox.
+
+
+## 9. Cloudflare (couche gratuite recommandée dès le domaine)
+
+Une fois le domaine disponible, passer le DNS par Cloudflare avant Vercel :
+
+1. Créer un compte gratuit sur `dash.cloudflare.com` → **Add a site** → saisir le domaine.
+2. Choisir le plan **Free**, importer les enregistrements DNS existants.
+3. Cloudflare affiche deux serveurs de noms (ex. `xxx.ns.cloudflare.com`) : les remplacer chez le registrar.
+4. Dans Cloudflare → **Security** :
+   - activer **Bot Fight Mode** (gratuit),
+   - créer une règle WAF simple : bloquer les requêtes avec un `User-Agent` vide,
+   - **Rate limiting** : la version gratuite est limitée — s'appuyer aussi sur nos limiteurs Express.
+5. SSL/TLS → chiffrage **Full (strict)** (Vercel fournit un certificat valide).
+6. Ne jamais mettre le site en « Development Mode » en production.
+
+L'objectif n'est pas de remplacer nos protections, mais d'ajouter une barrière avant même que la requête n'atteigne Vercel/Fly.
+
+## 10. Agent de surveillance et blocage IP
+
+Voir le document Word **`07-Protection-IA-et-Cloudflare.docx`**. En résumé :
+- 10 échecs de connexion en 15 min → IP bloquée 30 min (réversible).
+- Toutes les 15 min, un agent analyse les échecs, résume en français (LLM optionnel) et alerte.
+- Blocage manuel : `npm --workspace server run unblock -- <IP>` ou `POST /api/security/unblock`.
+- Les IP de confiance se déclarent dans `TRUSTED_IPS` (secret Fly).
+- La machine Fly reste allumée (`min_machines_running = 1`) pour que l'agent tourne.

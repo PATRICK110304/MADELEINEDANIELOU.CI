@@ -303,6 +303,48 @@ bullets(d, [
 ])
 d.save(f'{OUT}/06-Securisation-et-alertes.docx')
 
+
+# ---------------------------------------------------------------- 7
+d = base('7. Protection IA et Cloudflare', 'Couches de défense supplémentaires — réglages à valider par l’école.')
+d.add_heading('1. Les quatre couches mises en place', 2)
+table(d, ['Couche', 'Rôle', 'Coût', 'Décision requise'], [
+    ['Limiteurs + JWT + RLS', 'Bloquent le spam, les accès non autorisés et les abus de requêtes', 'Inclus', 'Aucune'],
+    ['Blocage IP deterministe', '10 échecs / 15 min → IP bloquée 30 min', 'Inclus', 'Valider le seuil et la durée'],
+    ['Agent IA de surveillance', 'Analyse les logs toutes les 15 min, résume en français, alerte', 'Gratuit sans LLM ; tokens si LLM', 'Choisir LLM ou résumé deterministe'],
+    ['Cloudflare (à venir)', 'WAF, DDoS, Bot Fight avant Vercel/Fly', 'Plan gratuit', 'À installer quand le domaine est connu'],
+], [4.2, 6.6, 3.4, 4.8])
+d.add_heading('2. Ce que fait l’agent IA', 2)
+bullets(d, [
+    'Lit uniquement les événements d’authentification (échecs, IP, email, date) — jamais de mot de passe.',
+    'Détecte : pics d’échecs, plusieurs IP distinctes, tentatives répétées sur le même compte.',
+    'Produit un résumé en français : « 47 échecs depuis 3 IP en 15 min, cible admin@… ».',
+    'Bloque prudemment les IP dépassant 4 échecs sur 15 min, pour 30 min, et t’envoie une alerte.',
+    'Écrit chaque action dans le journal d’audit public.audit_log.',
+])
+d.add_heading('3. Sécurité du dispositif', 2)
+bullets(d, [
+    'Aucun blocage définitif : toutes les restrictions expirent après 30 min.',
+    'Les IP de confiance (TRUSTED_IPS) ne sont jamais bloquées — y mettre l’IP du secrétariat.',
+    'Déblocage immédiat possible : npm --workspace server run unblock -- <IP>.',
+    'L’agent n’a pas accès aux secrets : il ne reçoit que des statistiques anonymisées.',
+    'La machine Fly reste allumée pour que la surveillance tourne (coût indicatif : quelques USD/mois).',
+])
+d.add_heading('4. Ce que tu dois décider / transmettre', 2)
+table(d, ['Élément', 'Où le renseigner', 'À nous transmettre'], [
+    ['IP du secrétariat', 'Secret Fly TRUSTED_IPS', 'L’IP publique (à obtenir en allant sur « whatismyip »)'],
+    ['Canal d’alerte', 'Secrets Fly (email / webhook / Twilio)', 'Le choix du canal + les identifiants saisis par toi'],
+    ['LLM pour le résumé', 'Secret Fly AI_API_KEY', 'Optionnel : clé OpenAI-compatible. Sans clé, résumé deterministe gratuit'],
+    ['Cloudflare', 'dash.cloudflare.com + registrar', 'Accès au compte Cloudflare une fois le domaine disponible'],
+], [4.4, 6.2, 8.4])
+d.add_heading('5. Limites à connaître', 2)
+bullets(d, [
+    'Aucun système ne promet « zéro attaque » : un DDoS volumétrique est stoppé par Cloudflare, pas par l’agent.',
+    'L’agent peut se tromper : c’est pour cela que les blocages sont courts et réversibles.',
+    'Le LLM optionnel consomme des tokens uniquement lorsqu’une anomalie est détectée.',
+    'Les limitations ne remplacent pas les sauvegardes Supabase ni les mises à jour du site.',
+])
+d.save(f'{OUT}/07-Protection-IA-et-Cloudflare.docx')
+
 print('Documents créés dans', OUT)
 for f in sorted(os.listdir(OUT)):
     print(' -', f, os.path.getsize(os.path.join(OUT, f)), 'octets')

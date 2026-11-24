@@ -22,6 +22,8 @@ import documentsRoutes from './routes/documents.js'
 import podcastsRoutes from './routes/podcasts.js'
 import photosRoutes from './routes/photos.js'
 import auditRoutes from './routes/audit.js'
+import securityRoutes from './routes/security.js'
+import { runSentinel } from './services/sentinel.js'
 
 const app = express()
 app.set('trust proxy', 1) // nécessaire derrière Vercel/Netlify/Nginx
@@ -73,6 +75,7 @@ app.use('/api/documents', documentsRoutes)
 app.use('/api/podcasts', podcastsRoutes)
 app.use('/api/photos', photosRoutes)
 app.use('/api/audit', auditRoutes)
+app.use('/api/security', securityRoutes)
 
 /* Route de santé (monitoring) */
 app.get('/api/health', (_req, res) => res.json({ status: 'ok', service: 'mdc-api' }))
@@ -88,6 +91,15 @@ async function start() {
   await loadDb()
   await seed()
   fs.mkdirSync(config.dataDir, { recursive: true })
+  /* Agent de surveillance : analyse les échecs de connexion toutes les
+     15 min. La machine Fly doit rester allumée (voir fly.toml). */
+  if (process.env.SENTINEL_ENABLED !== 'false') {
+    const every = Number(process.env.SENTINEL_INTERVAL_MS || 900000)
+    setTimeout(() => { void runSentinel() }, 60000).unref()
+    setInterval(() => { void runSentinel() }, every).unref()
+    console.log(`  • Sentinel actif (toutes les ${Math.round(every / 60000)} min)`)
+  }
+
   app.listen(config.port, () => {
     console.log(`✔ API MDC : http://localhost:${config.port}`)
     console.log(`  • Documents : ${config.documentsDir}`)
