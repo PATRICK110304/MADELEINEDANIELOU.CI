@@ -183,4 +183,5 @@ export function getDb() {
   return db
 }
 
+export { pool }
 export default { getDb, loadDb, saveDb, updateDb, pool }
