@@ -10,6 +10,7 @@ import crypto from 'node:crypto'
 import rateLimit from 'express-rate-limit'
 import { getDb, saveDb, updateDb } from '../db.js'
 import { requireAuth } from '../middleware/auth.js'
+import { auditRead } from '../middleware/audit.js'
 import { sendContactEmail } from '../services/email.js'
 
 const router = Router()
@@ -67,7 +68,7 @@ router.post('/', contactLimiter, async (req, res) => {
 })
 
 /* ---------- Admin : liste des messages (JWT) ---------- */
-router.get('/admin', requireAuth, (_req, res) => {
+router.get('/admin', requireAuth, auditRead('consultation_messages'), (_req, res) => {
   const db = getDb()
   res.json({ messages: Array.isArray(db.contactMessages) ? db.contactMessages : [] })
 })

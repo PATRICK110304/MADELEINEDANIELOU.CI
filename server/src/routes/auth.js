@@ -59,7 +59,7 @@ router.post('/login', loginLimiter, async (req, res) => {
 
 /* ---------- Profil connecté (protegé) ---------- */
 router.get('/me', requireAuth, (req, res) => {
-  res.json({ email: req.admin.email })
+  res.json({ email: req.admin.email, role: req.admin.role || null })
 })
 
 export default router

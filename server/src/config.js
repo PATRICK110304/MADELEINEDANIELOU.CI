@@ -32,6 +32,9 @@ export const config = {
   admin: {
     email: process.env.ADMIN_EMAIL || 'admin@madeleinedanielou.ci',
     password: process.env.ADMIN_PASSWORD || 'Secret@2026!',
+    /* Rôles autorisés (app_metadata.role dans Supabase).
+       Vide = pas de restriction de rôle, seule l'adresse admin compte. */
+    roles: (process.env.ADMIN_ROLES || '').split(',').map((r) => r.trim()).filter(Boolean),
   },
 
   /* reCAPTCHA v3 — vide en dev : la vérification est ignorée */

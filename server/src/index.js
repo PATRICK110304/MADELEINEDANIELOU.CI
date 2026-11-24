@@ -21,6 +21,7 @@ import inscriptionsRoutes from './routes/inscriptions.js'
 import documentsRoutes from './routes/documents.js'
 import podcastsRoutes from './routes/podcasts.js'
 import photosRoutes from './routes/photos.js'
+import auditRoutes from './routes/audit.js'
 
 const app = express()
 app.set('trust proxy', 1) // nécessaire derrière Vercel/Netlify/Nginx
@@ -71,6 +72,7 @@ app.use('/api/inscriptions', inscriptionsRoutes)
 app.use('/api/documents', documentsRoutes)
 app.use('/api/podcasts', podcastsRoutes)
 app.use('/api/photos', photosRoutes)
+app.use('/api/audit', auditRoutes)
 
 /* Route de santé (monitoring) */
 app.get('/api/health', (_req, res) => res.json({ status: 'ok', service: 'mdc-api' }))

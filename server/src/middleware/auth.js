@@ -32,7 +32,15 @@ export async function requireAuth(req, res, next) {
     if (!email || email !== allowed) {
       return res.status(403).json({ message: 'Ce compte n’est pas autorisé à administrer le site.' })
     }
-    req.admin = { id: user.id, email }
+
+    /* Contrôle de rôle optionnel : la direction peut restreindre l'accès
+       en renseignant ADMIN_ROLES (direction,secrétariat,communication)
+       et le champ app_metadata.role des comptes Supabase. */
+    const role = user.app_metadata?.role || null
+    if (config.admin.roles.length && (!role || !config.admin.roles.includes(role))) {
+      return res.status(403).json({ message: 'Votre rôle n’autorise pas cet accès.' })
+    }
+    req.admin = { id: user.id, email, role }
     return next()
   }
 

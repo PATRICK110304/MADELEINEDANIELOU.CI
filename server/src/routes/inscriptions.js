@@ -13,6 +13,7 @@ import rateLimit from 'express-rate-limit'
 import { getDb, saveDb, updateDb } from '../db.js'
 import { cleanString } from '../middleware/sanitize.js'
 import { requireAuth } from '../middleware/auth.js'
+import { auditRead } from '../middleware/audit.js'
 import { config } from '../config.js'
 
 const router = Router()
@@ -121,7 +122,7 @@ router.post('/', inscribeLimiter, async (req, res) => {
 })
 
 /* ---------- Liste des dossiers (administration) ---------- */
-router.get('/admin', requireAuth, (_req, res) => {
+router.get('/admin', requireAuth, auditRead('consultation_dossiers'), (_req, res) => {
   const items = [...getDb().inscriptions].sort((a, b) => b.createdAt.localeCompare(a.createdAt))
   res.json({ items })
 })

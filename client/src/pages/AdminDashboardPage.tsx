@@ -102,6 +102,23 @@ export default function AdminDashboardPage() {
   }
 
   /* Restaure la session Supabase au chargement (le SDK rafraîchit le JWT). */
+  /* L'espace d'administration ne doit pas être indexé. */
+  useEffect(() => {
+    let meta = document.querySelector<HTMLMetaElement>('meta[name="robots"]')
+    const previous = meta?.content
+    if (!meta) {
+      meta = document.createElement('meta')
+      meta.name = 'robots'
+      document.head.appendChild(meta)
+    }
+    meta.content = 'noindex, nofollow'
+    return () => {
+      if (!meta) return
+      if (previous) meta.content = previous
+      else meta.remove()
+    }
+  }, [])
+
   useEffect(() => { void getAdminToken().then((t) => setToken(t)) }, [])
   useEffect(() => { if (token) void load() }, [token])
 
@@ -131,6 +148,7 @@ export default function AdminDashboardPage() {
   function exportCsv() {
     const cols: (keyof Inscription)[] = ['reference', 'elevePrenom', 'eleveNom', 'naissance', 'classe', 'parentNom', 'lien', 'email', 'telephone', 'status', 'createdAt']
     const csv = [cols.join(';'), ...filteredInscriptions.map((i) => cols.map((c) => String(i[c] ?? '')).join(';'))].join('\n')
+    void api('/api/audit/export', 'POST', { format: 'csv', count: filteredInscriptions.length }).catch(() => {})
     const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' })); a.download = 'preinscriptions-gsmd.csv'; a.click(); URL.revokeObjectURL(a.href)
   }
 
