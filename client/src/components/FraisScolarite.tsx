@@ -20,7 +20,7 @@ export default function FraisScolarite() {
           {/* Pré-inscription */}
           <Reveal>
             <div className="rounded-3xl bg-white p-8 ring-1 ring-navy-100">
-              <h3 className="font-display text-xl font-semibold text-ink">Frais de pré-inscription</h3>
+              <h2 className="font-display text-xl font-semibold text-ink">Frais de pré-inscription</h2>
               <ul className="mt-5 space-y-3">
                 {fraisPreinscription.map((f) => (
                   <li key={f.cycle} className="flex items-center justify-between gap-4 border-b border-navy-100 pb-2 text-ink/90">
@@ -30,7 +30,7 @@ export default function FraisScolarite() {
                 ))}
               </ul>
 
-              <h3 className="font-display mt-8 text-xl font-semibold text-ink">Frais de scolarité ({paiement})</h3>
+              <h2 className="font-display mt-8 text-xl font-semibold text-ink">Frais de scolarité ({paiement})</h2>
               <ul className="mt-5 space-y-3">
                 {fraisScolarite.map((f) => (
                   <li key={f.cycle} className="flex items-center justify-between gap-4 border-b border-navy-100 pb-2 text-ink/90">
@@ -46,14 +46,14 @@ export default function FraisScolarite() {
           <Reveal delay={80}>
             <div className="flex h-full flex-col gap-6">
               <div className="rounded-3xl bg-white p-8 ring-1 ring-navy-100">
-                <h3 className="font-display flex items-center gap-2 text-xl font-semibold text-ink">
+                <h2 className="font-display flex items-center gap-2 text-xl font-semibold text-ink">
                   <Icon name="shield" className="h-5 w-5 text-navy-500" /> Compte bancaire
-                </h3>
+                </h2>
                 <p className="mt-4 text-ink/90">{compteBancaire.titulaire} — {compteBancaire.banque}</p>
                 <p className="mt-2 font-mono text-sm font-semibold text-navy-500">{compteBancaire.numero}</p>
               </div>
               <div id="processus" className="scroll-mt-24 rounded-3xl bg-white p-8 ring-1 ring-navy-100">
-                <h3 className="font-display text-xl font-semibold text-ink">Processus d'inscription</h3>
+                <h2 className="font-display text-xl font-semibold text-ink">Processus d'inscription</h2>
                 <ol className="mt-5 space-y-4">
                   {processus.map((p, i) => (
                     <li key={p} className="flex items-start gap-3 text-ink/90">

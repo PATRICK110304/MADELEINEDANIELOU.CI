@@ -65,5 +65,10 @@ export default function PhotoCard({
   if (href) {
     return <Link id={id} to={href} className={`group ${shell}`} onClick={onClick}>{body}</Link>
   }
-  return <button type="button" id={id} className={`group ${shell}`} onClick={onClick} aria-label={typeof buttonLabel === 'string' ? buttonLabel : undefined}>{body}</button>
+  if (onClick) {
+    return <button type="button" id={id} className={`group ${shell}`} onClick={onClick} aria-label={typeof buttonLabel === 'string' ? buttonLabel : undefined}>{body}</button>
+  }
+  /* Sans action, on reste un conteneur neutre : jamais de bouton vide,
+     ni d'imbrication interactive dans un lien (carte d'événement). */
+  return <div id={id} className={`group ${shell}`}>{body}</div>
 }

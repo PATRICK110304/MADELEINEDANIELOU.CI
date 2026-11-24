@@ -45,8 +45,8 @@ export default function CookieBanner() {
 
   return (
     <div
-      role="dialog"
-      aria-modal="false"
+      role="region"
+      aria-label="Consentement aux cookies"
       aria-labelledby="cookie-title"
       aria-describedby="cookie-desc"
       className="fixed inset-x-0 bottom-0 z-[70] border-t-4 border-navy-500 bg-white px-4 py-3 shadow-[0_-10px_40px_rgba(11,92,160,0.12)] sm:px-6 sm:py-5"

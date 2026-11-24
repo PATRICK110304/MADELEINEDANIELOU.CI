@@ -39,7 +39,7 @@ export default function ImageCard({
       {/* Contenu plus haut que le voile, ancré en bas, avec ombre */}
       <div className="absolute inset-0 z-20 flex flex-col justify-end gap-2 p-6 pb-7 sm:p-8 sm:pb-9">
         {label && <p className="text-[0.75rem] font-semibold tracking-[0.28em] uppercase text-[#FF9A6B] line-clamp-2" style={shadow}>{label}</p>}
-        {title && <h3 className="font-display text-2xl leading-snug font-semibold text-white line-clamp-2 sm:text-3xl" style={shadow}>{title}</h3>}
+        {title && <h2 className="font-display text-2xl leading-snug font-semibold text-white line-clamp-2 sm:text-3xl" style={shadow}>{title}</h2>}
         {children}
       </div>
     </>
